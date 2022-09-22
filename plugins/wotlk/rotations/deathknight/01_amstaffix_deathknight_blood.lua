@@ -1,6 +1,5 @@
 AMST_SHARE = AMST_SHARE or {}
 
-AMST_SHARE["onlineLoad"] = true
 ---@type DeathKnightBloodConfig
 local Config = {
     ---Toggle debug mode. Turn on, if you encounter some issues and want to deal with it, or record a video and send
