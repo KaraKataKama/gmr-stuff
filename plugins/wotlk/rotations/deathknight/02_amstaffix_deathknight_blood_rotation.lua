@@ -1,6 +1,6 @@
 AMST_SHARE = AMST_SHARE or {}
 AMST_SHARE["CR/DK/B.LOADED"] = true
-local VERSION = "v1.12.0"
+local VERSION = "v1.13.0"
 local printMsgPrefix = "[CR>DK/B|" .. VERSION .. "] "
 ---Print message with CR prefix
 ---@param msg string
