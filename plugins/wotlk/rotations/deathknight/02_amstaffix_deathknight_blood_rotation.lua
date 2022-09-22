@@ -384,7 +384,7 @@ function Rotation:execute()
 					end
 					if not found then
 						corpseIdToExplode = id
-						self.dbgPrint("Has corpse to explode id:'" .. id .. "'; create-type-id:'" .. tostring(createTypeId) .. "'")
+						self.dbgPrint("Has corpse to explode id:'" .. tostring(id) .. "'; create-type-id:'" .. tostring(createTypeId) .. "'")
 						break
 					end
 				end
