@@ -25,6 +25,7 @@ if Config.onlineLoad then
             GMR.RunString(content)
             if AMST_SHARE["CR>P/R.LOADED"] ~= true then
                 GMR.Print("[CR>P/R][ERROR] Rotation have not loaded properly!")
+                GMT.Print("[CR>P/R][ERROR] Content is: " .. content)
             end
         end
     })
