@@ -11,6 +11,7 @@
   - Divine Storm
   - All Judgements
   - All Auras
+  - Blessing of freedom
 - drop `01_amstaffix_paladin_retri.lua` into ` addons\Wrath of the Lichking\Plugins` directory
 ## Backlog
 - level up my paladin to lvl 70 and check all skills

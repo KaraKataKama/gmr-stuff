@@ -1,4 +1,6 @@
 # CHANGELOG:
+## v1.4.0
+- added blessing of freedom usage
 ## v1.3.0
 - added feature to dynamically change auras
 - rotation is responsible for aura changes

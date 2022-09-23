@@ -23,6 +23,8 @@ local Config = {
     defaultAuraToUse = 2, -- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Crusader Aura
     useCrusaderAuraWhileMounter = true,
     useCrusaderAuraWhileMounterMinDistance = 50,
+
+    useBlessingOfFreedom = true,
 }
 
 AMST_SHARE["CR>P/R.CFG"] = Config

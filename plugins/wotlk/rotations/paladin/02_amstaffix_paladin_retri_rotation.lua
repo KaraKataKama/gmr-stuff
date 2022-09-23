@@ -44,6 +44,7 @@ local spells = {
     retributionAura = GetSpellInfo(10301),
     concentrationAura = GetSpellInfo(19746),
     crusaderAura = GetSpellInfo(32223),
+    blessingOfFreedom = GetSpellInfo(1044),
 }
 
 local spellKnown = {
@@ -63,6 +64,7 @@ local spellKnown = {
     retributionAura = GMR.IsSpellKnown(spells.retributionAura),
     concentrationAura = GMR.IsSpellKnown(spells.concentrationAura),
     crusaderAura = GMR.IsSpellKnown(spells.crusaderAura),
+    blessingOfFreedom = GMR.IsSpellKnown(spells.blessingOfFreedom),
 }
 
 local buffs = {
@@ -128,6 +130,7 @@ local debuffs = {
     cripplingPoison = GetSpellInfo(3409),
     spellLock = GetSpellInfo(24259),
     faerieFire = GetSpellInfo(770),
+    envelopingWeb = GetSpellInfo(15471),
 }
 
 local debuffIndex = {}
@@ -201,7 +204,8 @@ local debuffCleanseClassWhiteList = {
     [debuffs.frostbolt] = { CLASS_WARRIOR, CLASS_PALADIN, CLASS_HUNTER, CLASS_ROGUE, CLASS_DEATHKNIGHT, CLASS_SHAMAN, CLASS_MONK, CLASS_DRUID, CLASS_DEMONHUNTER },
 }
 
-local debuffSpecialAction = {
+local debuffBlessingOfFreedomList = {
+    debuffs.envelopingWeb,
 }
 
 local glyphSpells = {
@@ -229,7 +233,9 @@ local Config = {
 
     defaultAuraToUse = 1, -- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Crusader Aura
     useCrusaderAuraWhileMounter = true,
-    useCrusaderAuraWhileMounterMinDistance = 80,
+    useCrusaderAuraWhileMounterMinDistance = 50,
+
+    useBlessingOfFreedom = true,
 }
 
 function Config:new()
@@ -365,9 +371,8 @@ function Rotation:execute()
         end
     end
 
-
     -- Judgement
-    if self.state.judgmentToUseKnown and GetSpellCooldown(self.state.judgmentToUse) == 0 then
+    if self.state.judgmentToUseKnown and GetSpellCooldown(self.state.judgmentToUse) == 0 and isTargetAttackable then
         local unitToCast = nil
         for i = 1, #GMR.Tables.Attackables do
             local attackable = GMR.Tables.Attackables[i][1]
@@ -413,12 +418,13 @@ function Rotation:execute()
         end
     end
 
-    if isTargetAttackable and GMR.IsCastable(self.state.judgmentToUse, "target") then
-        self.dbgPrint("should use default judgment '" .. self.state.judgmentToUse .. "'")
-        GMR.Cast(self.state.judgmentToUse, "target")
+    if self:applyBlessingOfFreedom("player") then
+        return
     end
 
-    self:executeGroupCleanse()
+    if self:executeGroupCleanse() then
+        return
+    end
 
     if isTargetAttackable and self.cfg.useHandOfReckoningToMakeDamage and spellKnown.handOfReckoning
         and not GMR.UnitIsPlayer("target") and not GMR.UnitIsUnit("targettarget", "player")
@@ -612,6 +618,32 @@ function Rotation:executeGroupCleanse()
     end
 
     return false
+end
+
+function Rotation:applyBlessingOfFreedom(unit)
+    if not self.cfg.useBlessingOfFreedom then
+        return false
+    end
+    if GMR.GetDistance("player", unit, ">", 30) then
+        return false
+    end
+    if not spellKnown.blessingOfFreedom or not GMR.IsCastable(spells.blessingOfFreedom, unit) then
+        return false
+    end
+
+    for index = 1, 40 do
+        local localeName, _, _, _, duration, expireAtTime, _, _, _, spellId = GMR.UnitDebuff(unit, index)
+        if localeName and expireAtTime - GetTime() < duration - math.random(5, 10) / 10 then
+            for i, debuffFromRegistry in ipairs(debuffBlessingOfFreedomList) do
+                if debuffFromRegistry == localeName then
+                    self.dbgPrint("should cast blessing of freedom on '" .. unit .. "' to remove debuff  '" ..
+                        localeName .. "':" .. tostring(spellId) .. ".")
+                    GMR.Cast(spells.blessingOfFreedom, unit)
+                    return true
+                end
+            end
+        end
+    end
 end
 
 ---@return boolean is casted anything
