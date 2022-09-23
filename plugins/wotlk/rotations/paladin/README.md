@@ -9,9 +9,8 @@
   - Crusader Strike
   - Consecrations
   - Divine Storm
-  - Judgement of Light
-  - Judgement of Wisdom
-  - Judgement of Justice
+  - All Judgements
+  - All Auras
 - drop `01_amstaffix_paladin_retri.lua` into ` addons\Wrath of the Lichking\Plugins` directory
 ## Backlog
 - level up my paladin to lvl 70 and check all skills

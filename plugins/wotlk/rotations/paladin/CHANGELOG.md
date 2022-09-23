@@ -1,4 +1,7 @@
 # CHANGELOG:
+## v1.3.0
+- added feature to dynamically change auras
+- rotation is responsible for aura changes
 ## v1.2.0
 - added smart group cleanse mod
 - added smart use of judgments

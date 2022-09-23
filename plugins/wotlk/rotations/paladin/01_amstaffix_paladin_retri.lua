@@ -6,7 +6,7 @@ local Config = {
     ---to author.
     debug = false,
     ---Use standard CombatRotation pluggable function. Change only if you know what you are doing.
-    useCombatRotationLauncher = false,
+    useCombatRotationLauncher = true,
     ---Use online loading feature to get last updates
     onlineLoad = true,
     consumeArtOfWarFlashLightMinHp = 80,
@@ -19,6 +19,10 @@ local Config = {
     useJudgmentCooldown = 10,
 
     useHandOfReckoningToMakeDamage = true,
+
+    defaultAuraToUse = 2, -- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Crusader Aura
+    useCrusaderAuraWhileMounter = true,
+    useCrusaderAuraWhileMounterMinDistance = 50,
 }
 
 AMST_SHARE["CR>P/R.CFG"] = Config

@@ -40,6 +40,10 @@ local spells = {
     judgementOfLight = GetSpellInfo(20271),
     judgementOfWisdom = GetSpellInfo(53408),
     judgementOfJustice = GetSpellInfo(53407),
+    devotionAura = GetSpellInfo(10293),
+    retributionAura = GetSpellInfo(10301),
+    concentrationAura = GetSpellInfo(19746),
+    crusaderAura = GetSpellInfo(32223),
 }
 
 local spellKnown = {
@@ -55,6 +59,10 @@ local spellKnown = {
     judgementOfLight = GMR.IsSpellKnown(spells.judgementOfLight),
     judgementOfWisdom = GMR.IsSpellKnown(spells.judgementOfWisdom),
     judgementOfJustice = GMR.IsSpellKnown(spells.judgementOfJustice),
+    devotionAura = GMR.IsSpellKnown(spells.devotionAura),
+    retributionAura = GMR.IsSpellKnown(spells.retributionAura),
+    concentrationAura = GMR.IsSpellKnown(spells.concentrationAura),
+    crusaderAura = GMR.IsSpellKnown(spells.crusaderAura),
 }
 
 local buffs = {
@@ -214,10 +222,14 @@ local Config = {
     useDivineStormMinEnemies = 2,
 
     groupCleanseModEnabled = false,
-    useJudgmentType = 1, -- 1 - Judgement of Light, 2 - Judgement of Wisdom, 3 - Judgement of Justice
+    useJudgmentType = 1, -- 1:Judgement of Light; 2:Judgement of Wisdom; 3:Judgement of Justice;
     useJudgmentCooldown = 10,
 
     useHandOfReckoningToMakeDamage = true,
+
+    defaultAuraToUse = 1, -- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Crusader Aura
+    useCrusaderAuraWhileMounter = true,
+    useCrusaderAuraWhileMounterMinDistance = 80,
 }
 
 function Config:new()
@@ -246,6 +258,7 @@ local State = {
     judgmentToUse = spells.judgementOfLight,
     judgmentToUseKnown = spellKnown.judgementOfLight,
     judgmentToUseDebuff = debuffs.judgementOfLight,
+    defaultAura = spells.devotionAura
 }
 
 function State:new()
@@ -267,6 +280,14 @@ function State:determine(cfg)
         self.judgmentToUse = spells.judgementOfJustice
         self.judgmentToUseKnown = spellKnown.judgementOfJustice
         self.judgmentToUseDebuff = debuffs.judgementOfJustice
+    end
+
+    if cfg.defaultAuraToUse == 2 and spellKnown.retributionAura then
+        self.defaultAura = spells.retributionAura
+    elseif cfg.defaultAuraToUse == 3 and spellKnown.concentrationAura then
+        self.defaultAura = spells.concentrationAura
+    elseif cfg.defaultAuraToUse == 4 and spellKnown.crusaderAura then
+        self.defaultAura = spells.crusaderAura
     end
 end
 
@@ -321,6 +342,10 @@ function Rotation:execute()
 
     if self:isSilent() then
         self.dbgPrint("player is silent, can't cast anything")
+        return
+    end
+
+    if self:executeAuraChange() then
         return
     end
 
@@ -589,6 +614,31 @@ function Rotation:executeGroupCleanse()
     return false
 end
 
+---@return boolean is casted anything
+function Rotation:executeAuraChange()
+    if self.cfg.useCrusaderAuraWhileMounter and spellKnown.crusaderAura and IsMounted("player") then
+        if not GMR.HasBuff("player", spells.crusaderAura)
+            and GMR.GetDestinationDistance() > self.cfg.useCrusaderAuraWhileMounterMinDistance
+            and GMR.IsCastable(spells.crusaderAura, "player")
+        then
+            self.dbgPrint("should change aura to crusader")
+            GMR.Cast(spells.crusaderAura, "player")
+            return true
+        end
+
+        -- should do nothing while mounted
+        return false
+    end
+
+    if not GMR.HasBuff("player", self.state.defaultAura) and GMR.IsCastable(self.state.defaultAura, "player") then
+        self.dbgPrint("should change aura to default '" .. self.state.defaultAura .. "'")
+        GMR.Cast(self.state.defaultAura, "player")
+        return true
+    end
+
+    return false
+end
+
 do
     local isSuccess, err = pcall(function()
         if GMR.GetClass("player") == "PALADIN" then
@@ -634,6 +684,10 @@ do
                         GMR.CustomCombatConditions = resultFunction
                         Error("Something changed GMR.CustomCombatConditions func, it was changed back!")
                     end
+                end)
+
+                C_Timer.NewTicker(0.5, function()
+                    rotation:executeAuraChange()
                 end)
             else
                 C_Timer.NewTicker(0.1, function()

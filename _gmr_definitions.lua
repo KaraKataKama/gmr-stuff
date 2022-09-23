@@ -385,6 +385,7 @@ function GMR.GetDebuffExpiration(unit, spell) end
 function GMR.GetDelay() end
 function GMR.GetDelayedQuestNpc() end
 function GMR.GetDestGryphonMaster() end
+---@return number
 function GMR.GetDestinationDistance() end
 function GMR.GetDifference() end
 function GMR.GetDirectoryFiles() end
