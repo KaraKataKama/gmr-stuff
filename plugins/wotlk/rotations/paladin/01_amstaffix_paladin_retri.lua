@@ -6,13 +6,19 @@ local Config = {
     ---to author.
     debug = false,
     ---Use standard CombatRotation pluggable function. Change only if you know what you are doing.
-    useCombatRotationLauncher = true,
+    useCombatRotationLauncher = false,
     ---Use online loading feature to get last updates
     onlineLoad = true,
     consumeArtOfWarFlashLightMinHp = 80,
     consumeArtOfWarFlashLightIfAuraDepletedSoon = true,
     useConsecrationsMinEnemies = 2,
     useDivineStormMinEnemies = 2,
+
+    groupCleanseModEnabled = false,
+    useJudgmentType = 1, -- 1 - Judgement of Light, 2 - Judgement of Wisdom, 3 - Judgement of Justice
+    useJudgmentCooldown = 10,
+
+    useHandOfReckoningToMakeDamage = true,
 }
 
 AMST_SHARE["CR>P/R.CFG"] = Config

@@ -9,11 +9,15 @@
   - Crusader Strike
   - Consecrations
   - Divine Storm
+  - Judgement of Light
+  - Judgement of Wisdom
+  - Judgement of Justice
 - drop `01_amstaffix_paladin_retri.lua` into ` addons\Wrath of the Lichking\Plugins` directory
 ## Backlog
 - level up my paladin to lvl 70 and check all skills
 - make a top retri DPS
 - some healer stuff?
+  - ~~smart group clense~~
 - some tank stuff?
 ## Tuning
 File has CFG lua table with some tune options, you can change as you like

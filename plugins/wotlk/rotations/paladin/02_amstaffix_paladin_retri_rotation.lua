@@ -1,6 +1,6 @@
 AMST_SHARE = AMST_SHARE or {}
 AMST_SHARE["CR>P/R.LOADED"] = true
-local VERSION = "v1.1.0"
+local VERSION = "v1.2.0"
 local printMsgPrefix = "[CR>P/R|" .. VERSION .. "] "
 
 ---Print message with CR prefix
@@ -13,6 +13,20 @@ local function Error(msg)
     Print(printMsgPrefix .. "[ERROR]  " .. msg)
 end
 
+local CLASS_WARRIOR = 1
+local CLASS_PALADIN = 2
+local CLASS_HUNTER = 3
+local CLASS_ROGUE = 4
+local CLASS_PRIEST = 5
+local CLASS_DEATHKNIGHT = 6
+local CLASS_SHAMAN = 7
+local CLASS_MAGE = 8
+local CLASS_WARLOCK = 9
+local CLASS_MONK = 10
+local CLASS_DRUID = 11
+local CLASS_DEMONHUNTER = 12
+local CLASS_EVOKER = 13
+
 local spells = {
     exorcism = GetSpellInfo(5614),
     flashOfLight = GetSpellInfo(19939),
@@ -23,6 +37,24 @@ local spells = {
     crusaderStrike = GetSpellInfo(35395),
     consecrations = GetSpellInfo(20116),
     divineStorm = GetSpellInfo(53385),
+    judgementOfLight = GetSpellInfo(20271),
+    judgementOfWisdom = GetSpellInfo(53408),
+    judgementOfJustice = GetSpellInfo(53407),
+}
+
+local spellKnown = {
+    exorcism = GMR.IsSpellKnown(spells.exorcism),
+    flashOfLight = GMR.IsSpellKnown(spells.flashOfLight),
+    hammerOfWrath = GMR.IsSpellKnown(spells.hammerOfWrath),
+    handOfReckoning = GMR.IsSpellKnown(spells.handOfReckoning),
+    purify = GMR.IsSpellKnown(spells.purify),
+    cleanse = GMR.IsSpellKnown(spells.cleanse),
+    crusaderStrike = GMR.IsSpellKnown(spells.crusaderStrike),
+    consecrations = GMR.IsSpellKnown(spells.consecrations),
+    divineStorm = GMR.IsSpellKnown(spells.divineStorm),
+    judgementOfLight = GMR.IsSpellKnown(spells.judgementOfLight),
+    judgementOfWisdom = GMR.IsSpellKnown(spells.judgementOfWisdom),
+    judgementOfJustice = GMR.IsSpellKnown(spells.judgementOfJustice),
 }
 
 local buffs = {
@@ -84,6 +116,10 @@ local debuffs = {
     shadowMastery = GetSpellInfo(17800),
     shadowEmbrace = GetSpellInfo(32391),
     earthbind = GetSpellInfo(3600),
+    dragonsBreath = GetSpellInfo(33043),
+    cripplingPoison = GetSpellInfo(3409),
+    spellLock = GetSpellInfo(24259),
+    faerieFire = GetSpellInfo(770),
 }
 
 local debuffIndex = {}
@@ -109,6 +145,12 @@ local debuffsLowPriority = {
     debuffs.deadlyPoison,
     debuffs.deadlyPoison7,
     debuffs.shadowMastery,
+    debuffs.ebonPlague,
+    debuffs.frostFever,
+    debuffs.huntersMark,
+    debuffs.faerieFire,
+    debuffs.vindication,
+    debuffs.frostbolt,
 }
 
 local debuffNotRecommendDispelList = {
@@ -140,25 +182,18 @@ local debuffTopPriorityList = {
     debuffs.deathCoil,
     debuffs.silencingShot,
     debuffs.psychicHorror,
+    debuffs.spellLock,
+}
+
+local debuffCleanseClassWhiteList = {
+    [debuffs.huntersMark] = { CLASS_DRUID, CLASS_ROGUE },
+    [debuffs.faerieFire] = { CLASS_DRUID, CLASS_ROGUE },
+    [debuffs.frostFever] = { CLASS_WARRIOR, CLASS_PALADIN, CLASS_HUNTER, CLASS_ROGUE, CLASS_DEATHKNIGHT, CLASS_SHAMAN, CLASS_MONK, CLASS_DRUID, CLASS_DEMONHUNTER },
+    [debuffs.vindication] = { CLASS_WARRIOR, CLASS_PALADIN, CLASS_HUNTER, CLASS_ROGUE, CLASS_DEATHKNIGHT, CLASS_SHAMAN, CLASS_MONK, CLASS_DRUID, CLASS_DEMONHUNTER }, -- melee only
+    [debuffs.frostbolt] = { CLASS_WARRIOR, CLASS_PALADIN, CLASS_HUNTER, CLASS_ROGUE, CLASS_DEATHKNIGHT, CLASS_SHAMAN, CLASS_MONK, CLASS_DRUID, CLASS_DEMONHUNTER },
 }
 
 local debuffSpecialAction = {
-    debuffs.huntersMark, -- druids and rogues
-    debuffs.vindication, -- melee only
-    debuffs.frostbolt, -- melee only
-    debuffs.frostFever, -- melee only
-}
-
-local spellKnown = {
-    exorcism = GMR.IsSpellKnown(spells.exorcism),
-    flashOfLight = GMR.IsSpellKnown(spells.flashOfLight),
-    hammerOfWrath = GMR.IsSpellKnown(spells.hammerOfWrath),
-    handOfReckoning = GMR.IsSpellKnown(spells.handOfReckoning),
-    purify = GMR.IsSpellKnown(spells.purify),
-    cleanse = GMR.IsSpellKnown(spells.cleanse),
-    crusaderStrike = GMR.IsSpellKnown(spells.crusaderStrike),
-    consecrations = GMR.IsSpellKnown(spells.consecrations),
-    divineStorm = GMR.IsSpellKnown(spells.divineStorm),
 }
 
 local glyphSpells = {
@@ -170,7 +205,7 @@ local Config = {
     ---to author.
     debug = false,
     ---Use standard CombatRotation pluggable function. Change only if you know what you are doing.
-    useCombatRotationLauncher = true,
+    useCombatRotationLauncher = false,
     ---Use online loading feature to get last updates
     onlineLoad = true,
     consumeArtOfWarFlashLightMinHp = 80,
@@ -178,8 +213,13 @@ local Config = {
     useConsecrationsMinEnemies = 2,
     useDivineStormMinEnemies = 2,
 
-    healModEnabled = true,
+    groupCleanseModEnabled = false,
+    useJudgmentType = 1, -- 1 - Judgement of Light, 2 - Judgement of Wisdom, 3 - Judgement of Justice
+    useJudgmentCooldown = 10,
+
+    useHandOfReckoningToMakeDamage = true,
 }
+
 function Config:new()
     local o = {}
     setmetatable(o, self)
@@ -203,7 +243,11 @@ end
 
 ---@class PaladinState
 local State = {
+    judgmentToUse = spells.judgementOfLight,
+    judgmentToUseKnown = spellKnown.judgementOfLight,
+    judgmentToUseDebuff = debuffs.judgementOfLight,
 }
+
 function State:new()
     local o = { }
     setmetatable(o, self)
@@ -215,7 +259,15 @@ end
 ---@param cfg PaladinConfig config
 ---@return void
 function State:determine(cfg)
-
+    if cfg.useJudgmentType == 2 and spellKnown.judgementOfWisdom then
+        self.judgmentToUse = spells.judgementOfWisdom
+        self.judgmentToUseKnown = spellKnown.judgementOfWisdom
+        self.judgmentToUseDebuff = debuffs.judgementOfWisdom
+    elseif cfg.useJudgmentType == 3 and spellKnown.judgementOfJustice then
+        self.judgmentToUse = spells.judgementOfJustice
+        self.judgmentToUseKnown = spellKnown.judgementOfJustice
+        self.judgmentToUseDebuff = debuffs.judgementOfJustice
+    end
 end
 
 ---@param cfg PaladinConfig
@@ -272,21 +324,43 @@ function Rotation:execute()
         return
     end
 
-    if spellKnown.handOfReckoning and not GMR.UnitIsPlayer("target") and not GMR.UnitIsUnit("targettarget", "player")
-        and GMR.IsCastable(spells.handOfReckoning, "target")
-    then
-        self.dbgPrint("should cast hand of reckoning to make some damage")
-        GMR.Cast(spells.handOfReckoning, "target")
-        return
+    local isTargetAttackable = GMR.IsAlive("target") and GMR.UnitCanAttack("player", "target")
+
+    -- Hammer of Wrath
+    if spellKnown.hammerOfWrath then
+        for i = 1, #GMR.Tables.Attackables do
+            local attackable = GMR.Tables.Attackables[i][1]
+            if GMR.ObjectExists(attackable) and GMR.IsAlive(attackable) and GMR.GetHealth(attackable) < 20
+                and GMR.IsCastable(spells.hammerOfWrath, attackable)
+            then
+                self.dbgPrint("should cast hammer of wrath")
+                GMR.Cast(spells.hammerOfWrath, attackable)
+                return
+            end
+        end
     end
 
-    for i = 1, #GMR.Tables.Attackables do
-        local attackable = GMR.Tables.Attackables[i][1]
-        if GMR.ObjectExists(attackable) and GMR.GetHealth(attackable) > 0 and GMR.GetHealth(attackable) < 20
-            and GMR.IsCastable(spells.hammerOfWrath, attackable)
-        then
-            self.dbgPrint("should cast hammer of wrath")
-            GMR.Cast(spells.hammerOfWrath, attackable)
+
+    -- Judgement
+    if self.state.judgmentToUseKnown and GetSpellCooldown(self.state.judgmentToUse) == 0 then
+        local unitToCast = nil
+        for i = 1, #GMR.Tables.Attackables do
+            local attackable = GMR.Tables.Attackables[i][1]
+            if GMR.ObjectExists(attackable) and GMR.IsCastable(self.state.judgmentToUse, attackable)
+                and GMR.GetDistance("player", attackable, "<", 10)
+                and GMR.GetDebuffExpiration(attackable, self.state.judgmentToUseDebuff) < self.cfg.useJudgmentCooldown
+            then
+                unitToCast = attackable
+                break
+            end
+        end
+        if not unitToCast and isTargetAttackable and GMR.GetDistance("player", "target", "<", 10) then
+            unitToCast = "target"
+        end
+
+        if unitToCast and GMR.IsCastable(self.state.judgmentToUse, unitToCast) then
+            self.dbgPrint("should cast default judgment '" .. self.state.judgmentToUse .. "'")
+            GMR.Cast(self.state.judgmentToUse, unitToCast)
             return
         end
     end
@@ -300,7 +374,7 @@ function Rotation:execute()
             self.dbgPrint("should cast flash of light on self to consume the art of war aura")
             GMR.Cast(spells.flashOfLight, "player")
             return
-        elseif spellKnown.exorcism and GMR.IsCastable(spells.exorcism, "target") then
+        elseif isTargetAttackable and spellKnown.exorcism and GMR.IsCastable(spells.exorcism, "target") then
             self.dbgPrint("should cast exorcism on target to consume the art of war aura")
             GMR.Cast(spells.exorcism, "target")
             return
@@ -312,6 +386,22 @@ function Rotation:execute()
             GMR.Cast(spells.flashOfLight, "player")
             return
         end
+    end
+
+    if isTargetAttackable and GMR.IsCastable(self.state.judgmentToUse, "target") then
+        self.dbgPrint("should use default judgment '" .. self.state.judgmentToUse .. "'")
+        GMR.Cast(self.state.judgmentToUse, "target")
+    end
+
+    self:executeGroupCleanse()
+
+    if isTargetAttackable and self.cfg.useHandOfReckoningToMakeDamage and spellKnown.handOfReckoning
+        and not GMR.UnitIsPlayer("target") and not GMR.UnitIsUnit("targettarget", "player")
+        and GMR.IsCastable(spells.handOfReckoning, "target")
+    then
+        self.dbgPrint("should cast hand of reckoning to make some damage")
+        GMR.Cast(spells.handOfReckoning, "target")
+        return
     end
 
     if spellKnown.consecrations and GMR.GetNumEnemies("player", 10) >= self.cfg.useConsecrationsMinEnemies
@@ -330,7 +420,7 @@ function Rotation:execute()
         return
     end
 
-    if spellKnown.crusaderStrike and GMR.IsCastable(spells.crusaderStrike, "target") then
+    if isTargetAttackable and spellKnown.crusaderStrike and GMR.IsCastable(spells.crusaderStrike, "target") then
         self.dbgPrint("should cast crusader strike")
         GMR.Cast(spells.crusaderStrike, "target")
         return
@@ -380,7 +470,7 @@ function Rotation:cleanse(unit)
         end
     end
 
-    local shouldCleanIndex = self:shouldCleanse(debuffNameToIndexMap)
+    local shouldCleanIndex = self:shouldCleanse(unit, debuffNameToIndexMap)
     if shouldCleanIndex then
         local localeName, _, _, _, _, _, _, _, _, spellId = GMR.UnitDebuff(unit, shouldCleanIndex)
         local unknownPart = ""
@@ -407,7 +497,15 @@ function Rotation:cleanse(unit)
 end
 
 --- @return number index
-function Rotation:shouldCleanse(debuffNameToIndexMap)
+function Rotation:shouldCleanse(unit, debuffNameToIndexMap)
+    for debuff, _ in pairs(debuffNameToIndexMap) do
+        for _, neverDispelDebuff in ipairs(debuffNeverDispelList) do
+            if neverDispelDebuff == debuff then
+                return nil
+            end
+        end
+    end
+
     for debuff, index in pairs(debuffNameToIndexMap) do
         for _, topPriorityDebuff in ipairs(debuffTopPriorityList) do
             if topPriorityDebuff == debuff then
@@ -417,17 +515,22 @@ function Rotation:shouldCleanse(debuffNameToIndexMap)
     end
 
     for debuff, _ in pairs(debuffNameToIndexMap) do
-        for _, neverDispelDebuff in ipairs(debuffNeverDispelList) do
-            if neverDispelDebuff == debuff then
+        for _, notDispelDebuff in ipairs(debuffNotRecommendDispelList) do
+            if notDispelDebuff == debuff then
                 return nil
             end
         end
     end
 
-    for debuff, _ in pairs(debuffNameToIndexMap) do
-        for _, notDispelDebuff in ipairs(debuffNotRecommendDispelList) do
-            if notDispelDebuff == debuff then
-                return nil
+    local unitClass = GMR.GetClass(unit)
+    for debuff, index in pairs(debuffNameToIndexMap) do
+        for whiteListDebuff, classList in pairs(debuffCleanseClassWhiteList) do
+            if debuff == whiteListDebuff then
+                for _, class in ipairs(classList) do
+                    if class == unitClass then
+                        return index
+                    end
+                end
             end
         end
     end
@@ -449,52 +552,41 @@ function Rotation:shouldCleanse(debuffNameToIndexMap)
     return nil
 end
 
-function Rotation:healerRotation()
-    if (not GMR.IsExecuting() or not GMR.IsAlive()) then
-        return
-    end
-
-    if GMR.IsEating("player") or GMR.IsDrinking("player") then
-        return
+---@return boolean casted something
+function Rotation:executeGroupCleanse()
+    if not self.cfg.groupCleanseModEnabled then
+        return false
     end
 
     if GMR.IsMoving() and IsMounted() then
-        return
+        return false
     end
 
     if not UnitInRaid("player") or not UnitInParty("player") then
-        return
-    end
-
-    if self:isStunned() then
-        self.dbgPrint("[Heal] player is stunned, can't do anything")
-        return
-    end
-
-    if self:isSilent() then
-        self.dbgPrint("[Heal] player is silent, can't cast anything")
-        return
+        return false
     end
 
     if self:cleanse("player") then
-        return
+        return true
     end
 
     if UnitInRaid("player") then
         for raidIndex = 1, 40 do
             local unit = "raid" .. tostring(raidIndex)
             if self:cleanse(unit) then
-                return
+                return true
             end
         end
     elseif UnitInParty("player") then
         for partyIndex = 1, 4 do
             local unit = "party" .. tostring(partyIndex)
             if self:cleanse(unit) then
-                return
+                return true
             end
         end
     end
+
+    return false
 end
 
 do
@@ -509,17 +601,21 @@ do
             state:determine(cfg)
 
             local rotation = Rotation:new(cfg, state)
-            local rotationFunc = function()
+            local executeRotationFunc = function()
                 local isSuccess, err = pcall(rotation.execute, rotation)
                 if not isSuccess then
                     Error("Can't launch rotation: " .. err)
                 end
             end
 
+            if cfg.groupCleanseModEnabled and cfg.useCombatRotationLauncher then
+                GMR.Print("You have turned on `groupCleanseModEnabled`;therefore, you should turn off `useCombatRotationLauncher` to get better results")
+            end
+
             if cfg.useCombatRotationLauncher then
                 local resultFunction = nil
                 if GMR.CustomCombatConditions == nil then
-                    resultFunction = rotationFunc
+                    resultFunction = executeRotationFunc
                 else
                     Print("There is another combat conditions, it will be merged with this rotation")
                     local oldCombatConditions = GMR.CustomCombatConditions
@@ -528,7 +624,7 @@ do
                         if not isSuccess then
                             Error("Can't launch previous custom combat rotation: " .. err)
                         end
-                        rotationFunc()
+                        executeRotationFunc()
                     end
                 end
 
@@ -545,17 +641,11 @@ do
                         return
                     end
 
-                    rotationFunc()
-                end)
-            end
-
-            if cfg.healModEnabled then
-                Print("Heal Mod initialized")
-                C_Timer.NewTicker(0.2, function()
-                    local ok, err = pcall(rotation.healerRotation, rotation)
-                    if not ok then
-                        Error(err)
+                    if GMR.IsEating("player") or GMR.IsDrinking("player") then
+                        return false
                     end
+
+                    executeRotationFunc()
                 end)
             end
 
