@@ -1,4 +1,4 @@
-# Death Knight Rotation
+# Paladin Rotation
 ## Installation
 - turn off spells in Spells tab:
   - Exorcism
