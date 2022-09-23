@@ -13,19 +13,19 @@ local function Error(msg)
     Print(printMsgPrefix .. "[ERROR]  " .. msg)
 end
 
-local CLASS_WARRIOR = 1
-local CLASS_PALADIN = 2
-local CLASS_HUNTER = 3
-local CLASS_ROGUE = 4
-local CLASS_PRIEST = 5
-local CLASS_DEATHKNIGHT = 6
-local CLASS_SHAMAN = 7
-local CLASS_MAGE = 8
-local CLASS_WARLOCK = 9
-local CLASS_MONK = 10
-local CLASS_DRUID = 11
-local CLASS_DEMONHUNTER = 12
-local CLASS_EVOKER = 13
+local CLASS_WARRIOR = "WARRIOR"
+local CLASS_PALADIN = "PALADIN"
+local CLASS_HUNTER = "HUNTER"
+local CLASS_ROGUE = "ROGUE"
+local CLASS_PRIEST = "PRIEST"
+local CLASS_DEATHKNIGHT = "DEATHKNIGHT"
+local CLASS_SHAMAN = "SHAMAN"
+local CLASS_MAGE = "MAGE"
+local CLASS_WARLOCK = "WARLOCK"
+local CLASS_MONK = "MONK"
+local CLASS_DRUID = "DRUID"
+local CLASS_DEMONHUNTER = "DEMONHUNTER"
+local CLASS_EVOKER = "EVOKER"
 
 local spells = {
     exorcism = GetSpellInfo(5614),
@@ -45,6 +45,15 @@ local spells = {
     concentrationAura = GetSpellInfo(19746),
     crusaderAura = GetSpellInfo(32223),
     blessingOfFreedom = GetSpellInfo(1044),
+    blessingOfMight = GetSpellInfo(19837),
+    blessingOfKings = GetSpellInfo(20217),
+    sealOfRighteousness = GetSpellInfo(21084),
+    sealOfJustice = GetSpellInfo(20164),
+    sealOfLight = GetSpellInfo(20165),
+    sealOfWisdom = GetSpellInfo(20166),
+    sealOfCommand = GetSpellInfo(20375),
+    greaterBlessingOfMight = GetSpellInfo(25916),
+    greaterBlessingOfKings = GetSpellInfo(25898),
 }
 
 local spellKnown = {
@@ -65,10 +74,35 @@ local spellKnown = {
     concentrationAura = GMR.IsSpellKnown(spells.concentrationAura),
     crusaderAura = GMR.IsSpellKnown(spells.crusaderAura),
     blessingOfFreedom = GMR.IsSpellKnown(spells.blessingOfFreedom),
+    blessingOfMight = GMR.IsSpellKnown(spells.blessingOfMight),
+    blessingOfKings = GMR.IsSpellKnown(spells.blessingOfKings),
+    sealOfRighteousness = GMR.IsSpellKnown(spells.sealOfRighteousness),
+    sealOfJustice = GMR.IsSpellKnown(spells.sealOfJustice),
+    sealOfLight = GMR.IsSpellKnown(spells.sealOfLight),
+    sealOfWisdom = GMR.IsSpellKnown(spells.sealOfWisdom),
+    sealOfCommand = GMR.IsSpellKnown(spells.sealOfCommand),
+    greaterBlessingOfMight = GMR.IsSpellKnown(spells.greaterBlessingOfMight),
+    greaterBlessingOfKings = GMR.IsSpellKnown(spells.greaterBlessingOfKings),
+
 }
 
 local buffs = {
     theArtOfWar = GetSpellInfo(59578),
+    blessingOfMight = GetSpellInfo(19837),
+    blessingOfKings = GetSpellInfo(20217),
+    sealOfRighteousness = GetSpellInfo(21084),
+    sealOfJustice = GetSpellInfo(20164),
+    sealOfLight = GetSpellInfo(20165),
+    sealOfWisdom = GetSpellInfo(20166),
+    sealOfCommand = GetSpellInfo(20375),
+    greaterBlessingOfMight = GetSpellInfo(25916),
+    greaterBlessingOfKings = GetSpellInfo(25898),
+    battleShout = GetSpellInfo(2048),
+}
+
+local buffSameClassLists = {
+    { buffs.greaterBlessingOfMight, buffs.blessingOfMight, buffs.battleShout },
+    { buffs.greaterBlessingOfKings, buffs.blessingOfKings },
 }
 
 local debuffs = {
@@ -131,6 +165,11 @@ local debuffs = {
     spellLock = GetSpellInfo(24259),
     faerieFire = GetSpellInfo(770),
     envelopingWeb = GetSpellInfo(15471),
+    aftermath = GetSpellInfo(18118),
+    entrapment = GetSpellInfo(19185),
+    cryptFever = GetSpellInfo(50509),
+    blackArrow = GetSpellInfo(63670),
+    faerieFireFeral = GetSpellInfo(16857),
 }
 
 local debuffIndex = {}
@@ -150,7 +189,7 @@ local debuffsLowPriority = {
     debuffs.judgementOfLight,
     debuffs.shadowWordPain,
     debuffs.bloodPlague,
-    debuffs.chilled,
+    --debuffs.chilled,
     debuffs.serpentSting,
     debuffs.judgementOfWisdom,
     debuffs.deadlyPoison,
@@ -161,7 +200,10 @@ local debuffsLowPriority = {
     debuffs.huntersMark,
     debuffs.faerieFire,
     debuffs.vindication,
-    debuffs.frostbolt,
+    --debuffs.frostbolt,
+    debuffs.cryptFever,
+    debuffs.blackArrow,
+    debuffs.faerieFireFeral,
 }
 
 local debuffNotRecommendDispelList = {
@@ -199,9 +241,14 @@ local debuffTopPriorityList = {
 local debuffCleanseClassWhiteList = {
     [debuffs.huntersMark] = { CLASS_DRUID, CLASS_ROGUE },
     [debuffs.faerieFire] = { CLASS_DRUID, CLASS_ROGUE },
+    [debuffs.faerieFireFeral] = { CLASS_DRUID, CLASS_ROGUE },
     [debuffs.frostFever] = { CLASS_WARRIOR, CLASS_PALADIN, CLASS_HUNTER, CLASS_ROGUE, CLASS_DEATHKNIGHT, CLASS_SHAMAN, CLASS_MONK, CLASS_DRUID, CLASS_DEMONHUNTER },
     [debuffs.vindication] = { CLASS_WARRIOR, CLASS_PALADIN, CLASS_HUNTER, CLASS_ROGUE, CLASS_DEATHKNIGHT, CLASS_SHAMAN, CLASS_MONK, CLASS_DRUID, CLASS_DEMONHUNTER }, -- melee only
     [debuffs.frostbolt] = { CLASS_WARRIOR, CLASS_PALADIN, CLASS_HUNTER, CLASS_ROGUE, CLASS_DEATHKNIGHT, CLASS_SHAMAN, CLASS_MONK, CLASS_DRUID, CLASS_DEMONHUNTER },
+}
+
+local debuffCustomLogicList = {
+    debuffs.livingBomb,
 }
 
 local debuffBlessingOfFreedomList = {
@@ -232,10 +279,16 @@ local Config = {
     useHandOfReckoningToMakeDamage = true,
 
     defaultAuraToUse = 1, -- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Crusader Aura
-    useCrusaderAuraWhileMounter = true,
+    defaultBlessingToUse = 1, -- 1:Blessing of Might; 2:Blessing of Kings
+    defaultSealToUse = 1, -- 1:Seal of Righteousness; 2:Seal of Justice; 3:Seal of Light; 4:Seal of Wisdom; 5:Seal of Command
+
+    useCrusaderAuraWhileMounted = true,
     useCrusaderAuraWhileMounterMinDistance = 50,
 
     useBlessingOfFreedom = true,
+
+    groupBuffModEnabled = true,
+    groupBuffModMinMana = 70,
 }
 
 function Config:new()
@@ -264,7 +317,17 @@ local State = {
     judgmentToUse = spells.judgementOfLight,
     judgmentToUseKnown = spellKnown.judgementOfLight,
     judgmentToUseDebuff = debuffs.judgementOfLight,
-    defaultAura = spells.devotionAura
+
+    defaultAura = spells.devotionAura,
+
+    defaultBlessingSpell = spells.blessingOfMight,
+    defaultBlessingKnown = spellKnown.blessingOfMight,
+    defaultBlessingBuff = buffs.blessingOfMight,
+    defaultBlessingGreaterBuff = buffs.greaterBlessingOfMight,
+
+    defaultSealSpell = spells.sealOfRighteousness,
+    defaultSealKnown = spellKnown.sealOfRighteousness,
+    defaultSealBuff = buffs.sealOfRighteousness,
 }
 
 function State:new()
@@ -294,6 +357,31 @@ function State:determine(cfg)
         self.defaultAura = spells.concentrationAura
     elseif cfg.defaultAuraToUse == 4 and spellKnown.crusaderAura then
         self.defaultAura = spells.crusaderAura
+    end
+
+    if cfg.defaultBlessingToUse == 2 and spellKnown.blessingOfKings then
+        self.defaultBlessingSpell = spells.blessingOfKings
+        self.defaultBlessingKnown = spellKnown.blessingOfKings
+        self.defaultBlessingBuff = buffs.blessingOfKings
+        self.defaultBlessingGreaterBuff = buffs.greaterBlessingOfKings
+    end
+
+    if cfg.defaultSealToUse == 2 and spellKnown.sealOfJustice then
+        self.defaultSealSpell = spells.sealOfJustice
+        self.defaultSealKnown = spellKnown.sealOfJustice
+        self.defaultSealBuff = buffs.sealOfJustice
+    elseif cfg.defaultSealToUse == 3 and spellKnown.sealOfLight then
+        self.defaultSealSpell = spells.sealOfLight
+        self.defaultSealKnown = spellKnown.sealOfLight
+        self.defaultSealBuff = buffs.sealOfLight
+    elseif cfg.defaultSealToUse == 4 and spellKnown.sealOfWisdom then
+        self.defaultSealSpell = spells.sealOfWisdom
+        self.defaultSealKnown = spellKnown.sealOfWisdom
+        self.defaultSealBuff = buffs.sealOfWisdom
+    elseif cfg.defaultSealToUse == 5 and spellKnown.sealOfCommand then
+        self.defaultSealSpell = spells.sealOfCommand
+        self.defaultSealKnown = spellKnown.sealOfCommand
+        self.defaultSealBuff = buffs.sealOfCommand
     end
 end
 
@@ -339,6 +427,35 @@ function Rotation:new(cfg, state)
     return o
 end
 
+local function HasBuffClassed(unit, buff, byPlayer)
+    local hasSameClassBuff = false
+    local sameClassBuffList = nil
+    for _, list in ipairs(buffSameClassLists) do
+        for _, buffFromList in ipairs(list) do
+            if buff == buffFromList then
+                hasSameClassBuff = true
+                sameClassBuffList = list
+                break
+            end
+        end
+        if hasSameClassBuff then
+            break
+        end
+    end
+
+    if not hasSameClassBuff then
+        return GMR.HasBuff(unit, buff, byPlayer)
+    end
+
+    for _, buffFromList in ipairs(sameClassBuffList) do
+        if GMR.HasBuff(unit, buffFromList, byPlayer) then
+            return true
+        end
+    end
+
+    return false
+end
+
 ---@return void
 function Rotation:execute()
     if self:isStunned() then
@@ -355,7 +472,28 @@ function Rotation:execute()
         return
     end
 
+    if GMR.IsMoving() and IsMounted("player") then
+        return
+    end
+
+    if self.state.defaultBlessingKnown and not HasBuffClassed("player", self.state.defaultBlessingBuff)
+        and GMR.IsCastable(self.state.defaultBlessingSpell, "player")
+    then
+        self.dbgPrint("should cast default blessing '" .. self.state.defaultBlessingSpell .. "' on player")
+        GMR.Cast(self.state.defaultBlessingSpell, "player")
+        return
+    end
+
+    if self.state.defaultSealKnown and not GMR.HasBuff("player", self.state.defaultSealBuff)
+        and GMR.IsCastable(self.state.defaultSealSpell, "player")
+    then
+        self.dbgPrint("should cast default seal '" .. self.state.defaultSealSpell .. "' on player")
+        GMR.Cast(self.state.defaultSealSpell, "player")
+        return
+    end
+
     local isTargetAttackable = GMR.IsAlive("target") and GMR.UnitCanAttack("player", "target")
+        and not GMR.IsImmune("target")
 
     -- Hammer of Wrath
     if spellKnown.hammerOfWrath then
@@ -378,6 +516,7 @@ function Rotation:execute()
             local attackable = GMR.Tables.Attackables[i][1]
             if GMR.ObjectExists(attackable) and GMR.IsCastable(self.state.judgmentToUse, attackable)
                 and GMR.GetDistance("player", attackable, "<", 10)
+                and not GMR.IsImmune(attackable)
                 and GMR.GetDebuffExpiration(attackable, self.state.judgmentToUseDebuff) < self.cfg.useJudgmentCooldown
             then
                 unitToCast = attackable
@@ -395,7 +534,9 @@ function Rotation:execute()
         end
     end
 
-    self:cleanse("player")
+    if self:cleanse("player") then
+        return
+    end
 
     if GMR.HasBuff("player", buffs.theArtOfWar) then
         if spellKnown.flashOfLight and GMR.GetHealth("player") < self.cfg.consumeArtOfWarFlashLightMinHp
@@ -456,6 +597,10 @@ function Rotation:execute()
         GMR.Cast(spells.crusaderStrike, "target")
         return
     end
+
+    if self:executeGroupBuff() then
+        return
+    end
 end
 
 ---@return boolean
@@ -476,6 +621,9 @@ end
 ---@return boolean Did cleanse
 function Rotation:cleanse(unit)
     if GMR.GetDistance("player", unit, ">", 40) then
+        return false
+    end
+    if not GMR.IsAlive(unit) then
         return false
     end
     if spellKnown.cleanse and not GMR.IsCastable(spells.cleanse, unit) then
@@ -529,6 +677,12 @@ end
 
 --- @return number index
 function Rotation:shouldCleanse(unit, debuffNameToIndexMap)
+    for debuff, index in pairs(debuffNameToIndexMap) do
+        if debuff == debuffs.livingBomb and GMR.GetNumPartyMembersAroundUnit(unit) == 0 then
+            return index
+        end
+    end
+
     for debuff, _ in pairs(debuffNameToIndexMap) do
         for _, neverDispelDebuff in ipairs(debuffNeverDispelList) do
             if neverDispelDebuff == debuff then
@@ -589,16 +743,8 @@ function Rotation:executeGroupCleanse()
         return false
     end
 
-    if GMR.IsMoving() and IsMounted() then
-        return false
-    end
-
     if not UnitInRaid("player") or not UnitInParty("player") then
         return false
-    end
-
-    if self:cleanse("player") then
-        return true
     end
 
     if UnitInRaid("player") then
@@ -646,9 +792,79 @@ function Rotation:applyBlessingOfFreedom(unit)
     end
 end
 
+---@return boolean did cast something
+function Rotation:executeGroupBuff()
+    if not self.cfg.groupBuffModEnabled or GMR.GetMana("player") < self.cfg.groupBuffModMinMana then
+        return false
+    end
+
+    if not UnitInRaid("player") or not UnitInParty("player") then
+        return false
+    end
+
+    if UnitInRaid("player") then
+        for raidIndex = 1, 40 do
+            local unit = "raid" .. tostring(raidIndex)
+            if self:buff(unit) then
+                return true
+            end
+        end
+    elseif UnitInParty("player") then
+        for partyIndex = 1, 4 do
+            local unit = "party" .. tostring(partyIndex)
+            if self:buff(unit) then
+                return true
+            end
+        end
+    end
+
+    return false
+end
+
+---@return boolean did cast something
+function Rotation:buff(unit)
+    if not GMR.IsAlive(unit) then
+        return false
+    end
+
+    local unitClass = GMR.GetClass(unit)
+    local hasBlessingOfMight = HasBuffClassed(unit, buffs.blessingOfMight)
+    local hasBlessingOfKings = HasBuffClassed(unit, buffs.blessingOfKings)
+    local hasBlessingOfMightByPlayer = HasBuffClassed(unit, buffs.blessingOfMight, true)
+    local hasBlessingOfKingsByPlayer = HasBuffClassed(unit, buffs.blessingOfKings, true)
+    if not hasBlessingOfMight and (unitClass == CLASS_ROGUE or unitClass == CLASS_DEATHKNIGHT or unitClass == CLASS_HUNTER or unitClass == CLASS_PALADIN
+        or unitClass == CLASS_WARRIOR)
+    then
+        if GMR.IsCastable(spells.blessingOfMight, unit) then
+            self.dbgPrint("should buff '" .. unit .. "' with blessing of might")
+            GMR.Cast(spells.blessingOfMight, unit)
+            return true
+        end
+    end
+    if not hasBlessingOfKings and (unitClass == CLASS_DRUID or unitClass == CLASS_MAGE or unitClass == CLASS_PRIEST
+        or unitClass == CLASS_SHAMAN or unitClass == CLASS_WARLOCK)
+    then
+        if GMR.IsCastable(spells.blessingOfKings, unit) then
+            self.dbgPrint("should buff '" .. unit .. "' with blessing of kings")
+            GMR.Cast(spells.blessingOfKings, unit)
+            return true
+        end
+    end
+
+    if not hasBlessingOfMightByPlayer and not hasBlessingOfKingsByPlayer then
+        if not hasBlessingOfKings and GMR.IsCastable(spells.blessingOfKings, unit) then
+            self.dbgPrint("should buff '" .. unit .. "' with blessing of kings as additional buff")
+            GMR.Cast(spells.blessingOfKings, unit)
+            return true
+        end
+    end
+
+    return false
+end
+
 ---@return boolean is casted anything
 function Rotation:executeAuraChange()
-    if self.cfg.useCrusaderAuraWhileMounter and spellKnown.crusaderAura and IsMounted("player") then
+    if self.cfg.useCrusaderAuraWhileMounted and spellKnown.crusaderAura and IsMounted("player") then
         if not GMR.HasBuff("player", spells.crusaderAura)
             and GMR.GetDestinationDistance() > self.cfg.useCrusaderAuraWhileMounterMinDistance
             and GMR.IsCastable(spells.crusaderAura, "player")
