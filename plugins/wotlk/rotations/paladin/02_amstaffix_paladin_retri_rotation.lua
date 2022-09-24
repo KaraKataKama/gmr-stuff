@@ -105,6 +105,12 @@ local buffs = {
     greaterBlessingOfMight = GetSpellInfo(25916),
     greaterBlessingOfKings = GetSpellInfo(25898),
     battleShout = GetSpellInfo(2048),
+    devotionAura = GetSpellInfo(10293),
+    retributionAura = GetSpellInfo(10301),
+    concentrationAura = GetSpellInfo(19746),
+    crusaderAura = GetSpellInfo(32223),
+    shadowResistanceAura = GetSpellInfo(27151),
+    frostResistanceAura = GetSpellInfo(19898),
 }
 
 local buffSameClassLists = {
@@ -178,6 +184,9 @@ local debuffs = {
     blackArrow = GetSpellInfo(63670),
     faerieFireFeral = GetSpellInfo(16857),
     forbearance = GetSpellInfo(25771),
+    freezingTrapEffect = GetSpellInfo(14309),
+    markOfBlood = GetSpellInfo(49005),
+    freeze = GetSpellInfo(33395),
 }
 
 local debuffIndex = {}
@@ -197,7 +206,7 @@ local debuffsLowPriority = {
     debuffs.judgementOfLight,
     debuffs.shadowWordPain,
     debuffs.bloodPlague,
-    --debuffs.chilled,
+    debuffs.chilled,
     debuffs.serpentSting,
     debuffs.judgementOfWisdom,
     debuffs.deadlyPoison,
@@ -208,7 +217,7 @@ local debuffsLowPriority = {
     debuffs.huntersMark,
     debuffs.faerieFire,
     debuffs.vindication,
-    --debuffs.frostbolt,
+    debuffs.frostbolt,
     debuffs.cryptFever,
     debuffs.blackArrow,
     debuffs.faerieFireFeral,
@@ -227,7 +236,6 @@ local debuffTopPriorityList = {
     debuffs.frostbite,
     debuffs.chainsOfIce,
     debuffs.hammerOfJustice,
-    debuffs.seedOfCorruption,
     debuffs.strangulate,
     debuffs.thunderclap,
     debuffs.woundPoison5,
@@ -244,6 +252,9 @@ local debuffTopPriorityList = {
     debuffs.silencingShot,
     debuffs.psychicHorror,
     debuffs.spellLock,
+    debuffs.freezingTrapEffect,
+    debuffs.markOfBlood,
+    debuffs.freeze,
 }
 
 local debuffCleanseClassWhiteList = {
@@ -253,6 +264,7 @@ local debuffCleanseClassWhiteList = {
     [debuffs.frostFever] = { CLASS_WARRIOR, CLASS_PALADIN, CLASS_HUNTER, CLASS_ROGUE, CLASS_DEATHKNIGHT, CLASS_SHAMAN, CLASS_MONK, CLASS_DRUID, CLASS_DEMONHUNTER },
     [debuffs.vindication] = { CLASS_WARRIOR, CLASS_PALADIN, CLASS_HUNTER, CLASS_ROGUE, CLASS_DEATHKNIGHT, CLASS_SHAMAN, CLASS_MONK, CLASS_DRUID, CLASS_DEMONHUNTER }, -- melee only
     [debuffs.frostbolt] = { CLASS_WARRIOR, CLASS_PALADIN, CLASS_HUNTER, CLASS_ROGUE, CLASS_DEATHKNIGHT, CLASS_SHAMAN, CLASS_MONK, CLASS_DRUID, CLASS_DEMONHUNTER },
+    [debuffs.chilled] = { CLASS_WARRIOR, CLASS_PALADIN, CLASS_HUNTER, CLASS_ROGUE, CLASS_DEATHKNIGHT, CLASS_SHAMAN, CLASS_MONK, CLASS_DRUID, CLASS_DEMONHUNTER },
 }
 
 local debuffCustomLogicList = {
@@ -303,6 +315,38 @@ local Config = {
     useHandOfProtectionMinHP = 40,
 }
 
+---@class PaladinAuraSettings
+local AuraSettings = {
+    cfgIndex = 0,
+    spell = "",
+    spellKnown = "",
+    buff = "",
+}
+
+---@return PaladinAuraSettings
+function AuraSettings:new(cfgIndex, spell, spellKnown, buff)
+    local o = {
+        cfgIndex = cfgIndex,
+        spell = spell,
+        spellKnown = spellKnown,
+        buff = buff,
+    }
+    setmetatable(o, self)
+    self.__index = self
+    return o
+end
+
+-- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Shadow Resistance Aura; 5:Frost Resistance Aura
+
+---@type table<number, PaladinAuraSettings>
+local cfgIndexToAuraSettingsMap = {
+    [1] = AuraSettings:new(1, spells.devotionAura, spellKnown.devotionAura, buffs.devotionAura),
+    [2] = AuraSettings:new(2, spells.retributionAura, spellKnown.retributionAura, buffs.retributionAura),
+    [3] = AuraSettings:new(3, spells.concentrationAura, spellKnown.concentrationAura, buffs.concentrationAura),
+    [4] = AuraSettings:new(4, spells.shadowResistanceAura, spellKnown.shadowResistanceAura, buffs.shadowResistanceAura),
+    [5] = AuraSettings:new(5, spells.frostResistanceAura, spellKnown.frostResistanceAura, buffs.frostResistanceAura),
+}
+
 function Config:new()
     local o = {}
     setmetatable(o, self)
@@ -335,7 +379,6 @@ local State = {
     defaultBlessingSpell = spells.blessingOfMight,
     defaultBlessingKnown = spellKnown.blessingOfMight,
     defaultBlessingBuff = buffs.blessingOfMight,
-    defaultBlessingGreaterBuff = buffs.greaterBlessingOfMight,
 
     defaultSealSpell = spells.sealOfRighteousness,
     defaultSealKnown = spellKnown.sealOfRighteousness,
@@ -363,19 +406,14 @@ function State:determine(cfg)
         self.judgmentToUseDebuff = debuffs.judgementOfJustice
     end
 
-    if cfg.defaultAuraToUse == 2 and spellKnown.retributionAura then
-        self.defaultAura = spells.retributionAura
-    elseif cfg.defaultAuraToUse == 3 and spellKnown.concentrationAura then
-        self.defaultAura = spells.concentrationAura
-    elseif cfg.defaultAuraToUse == 4 and spellKnown.crusaderAura then
-        self.defaultAura = spells.crusaderAura
+    if cfgIndexToAuraSettingsMap[cfg.defaultAuraToUse] and cfgIndexToAuraSettingsMap[cfg.defaultAuraToUse].spellKnown then
+        self.defaultAura = cfgIndexToAuraSettingsMap[cfg.defaultAuraToUse].spell
     end
 
     if cfg.defaultBlessingToUse == 2 and spellKnown.blessingOfKings then
         self.defaultBlessingSpell = spells.blessingOfKings
         self.defaultBlessingKnown = spellKnown.blessingOfKings
         self.defaultBlessingBuff = buffs.blessingOfKings
-        self.defaultBlessingGreaterBuff = buffs.greaterBlessingOfKings
     end
 
     if cfg.defaultSealToUse == 2 and spellKnown.sealOfJustice then
@@ -913,36 +951,24 @@ function Rotation:executeAuraChange()
         GMR.Cast(self.state.defaultAura, "player")
         return true
     end
-    --
-    --if not GMR.HasBuff("player", self.state.defaultAura, true) then
-    --    for _, cfgIndex in ipairs(self.cfg.defaultAuraChangeIfAlreadyExist) do
-    --        if cfgIndex == 1 and spellKnown.devotionAura and not GMR.HasBuff("player", spells.devotionAura)
-    --            and GMR.IsCastable(spells.devotionAura, "player")
-    --        then
-    --            self.dbgPrint("should cast devotion aura as reserve aura")
-    --            GMR.Cast(spells.devotionAura, "player")
-    --            return true
-    --        elseif cfgIndex == 2 and spellKnown.retributionAura and not GMR.HasBuff("player", spells.retributionAura)
-    --            and GMR.IsCastable(spells.retributionAura, "player")
-    --        then
-    --            self.dbgPrint("should cast retribution aura as reserve aura")
-    --            GMR.Cast(spells.retributionAura, "player")
-    --            return true
-    --        elseif cfgIndex == 3 and spellKnown.concentrationAura and not GMR.HasBuff("player", spells.concentrationAura)
-    --            and GMR.IsCastable(spells.concentrationAura, "player")
-    --        then
-    --            self.dbgPrint("should cast concentration aura as reserve aura")
-    --            GMR.Cast(spells.concentrationAura, "player")
-    --            return true
-    --        elseif cfgIndex == 5 and spellKnown.frostResistanceAura and not GMR.HasBuff("player", spells.frostResistanceAura)
-    --            and GMR.IsCastable(spells.frostResistanceAura, "player")
-    --        then
-    --            self.dbgPrint("should cast frost resistance aura as reserve aura")
-    --            GMR.Cast(spells.frostResistanceAura, "player")
-    --            return true
-    --        end
-    --    end
-    --end
+
+    if not GMR.HasBuff("player", self.state.defaultAura, true) then
+        for _, cfgIndex in ipairs(self.cfg.defaultAuraChangeIfAlreadyExist) do
+            local auraSettings = cfgIndexToAuraSettingsMap[cfgIndex]
+            if auraSettings and auraSettings.spellKnown then
+                if GMR.HasBuff("player", auraSettings.buff) then
+                    if GMR.HasBuff("player", auraSettings.buff, true) then
+                        -- it's mine aura, no check further
+                        break
+                    end
+                else
+                    self.dbgPrint("should cast alternative aura with index #" .. tostring(cfgIndex) .. ", '" .. auraSettings.spell .. "'")
+                    GMR.Cast(auraSettings.spell, "player")
+                    return true
+                end
+            end
+        end
+    end
 
     return false
 end
