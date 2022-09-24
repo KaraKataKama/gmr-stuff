@@ -1,5 +1,4 @@
 AMST_SHARE = AMST_SHARE or {}
-AMST_SHARE["CR/DK/B.LOADED"] = true
 local VERSION = "v1.13.0"
 local printMsgPrefix = "[CR>DK/B|" .. VERSION .. "] "
 ---Print message with CR prefix
@@ -627,6 +626,13 @@ end
 
 do
 	local isSuccess, err = pcall(function()
+        if AMST_SHARE["CR/DK/B.LOADED"] == true then
+            Error("There are two versions of the rotation uploaded. It may happen if you downloaded 02_amstaffix_deathknight_blood_rotation.lua file.")
+            Error("Please delete it, or change `Config.onlineLoad` to `false` if you want to use offline version of rotation.")
+            return
+        end
+        AMST_SHARE["CR/DK/B.LOADED"] = true
+
 		-- turn on only for death knight class
 		if GMR.GetClass("player") == "DEATHKNIGHT" then
 			Print("Rotation would be initialized")
