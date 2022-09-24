@@ -1,6 +1,6 @@
 AMST_SHARE = AMST_SHARE or {}
 AMST_SHARE["CR>P/R.LOADED"] = true
-local VERSION = "v1.2.0"
+local VERSION = "v1.4.0"
 local printMsgPrefix = "[CR>P/R|" .. VERSION .. "] "
 
 ---Print message with CR prefix
@@ -54,6 +54,10 @@ local spells = {
     sealOfCommand = GetSpellInfo(20375),
     greaterBlessingOfMight = GetSpellInfo(25916),
     greaterBlessingOfKings = GetSpellInfo(25898),
+    shadowResistanceAura = GetSpellInfo(27151),
+    frostResistanceAura = GetSpellInfo(19898),
+    divineProtection = GetSpellInfo(498),
+    handOfProtection = GetSpellInfo(5599),
 }
 
 local spellKnown = {
@@ -83,7 +87,10 @@ local spellKnown = {
     sealOfCommand = GMR.IsSpellKnown(spells.sealOfCommand),
     greaterBlessingOfMight = GMR.IsSpellKnown(spells.greaterBlessingOfMight),
     greaterBlessingOfKings = GMR.IsSpellKnown(spells.greaterBlessingOfKings),
-
+    shadowResistanceAura = GMR.IsSpellKnown(spells.shadowResistanceAura),
+    frostResistanceAura = GMR.IsSpellKnown(spells.frostResistanceAura),
+    divineProtection = GMR.IsSpellKnown(spells.divineProtection),
+    handOfProtection = GMR.IsSpellKnown(spells.handOfProtection),
 }
 
 local buffs = {
@@ -170,6 +177,7 @@ local debuffs = {
     cryptFever = GetSpellInfo(50509),
     blackArrow = GetSpellInfo(63670),
     faerieFireFeral = GetSpellInfo(16857),
+    forbearance = GetSpellInfo(25771),
 }
 
 local debuffIndex = {}
@@ -278,7 +286,8 @@ local Config = {
 
     useHandOfReckoningToMakeDamage = true,
 
-    defaultAuraToUse = 1, -- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Crusader Aura
+    defaultAuraToUse = 1, -- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Shadow Resistance Aura; 5:Frost Resistance Aura
+    defaultAuraChangeIfAlreadyExist = { 1, 3 }, -- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Crusader Aura
     defaultBlessingToUse = 1, -- 1:Blessing of Might; 2:Blessing of Kings
     defaultSealToUse = 1, -- 1:Seal of Righteousness; 2:Seal of Justice; 3:Seal of Light; 4:Seal of Wisdom; 5:Seal of Command
 
@@ -289,6 +298,9 @@ local Config = {
 
     groupBuffModEnabled = true,
     groupBuffModMinMana = 70,
+
+    useDivineProtectionMinHP = 70,
+    useHandOfProtectionMinHP = 40,
 }
 
 function Config:new()
@@ -474,6 +486,24 @@ function Rotation:execute()
 
     if GMR.IsMoving() and IsMounted("player") then
         return
+    end
+
+    if not GMR.HasDebuff("player", debuffs.forbearance) then
+        if spellKnown.handOfProtection and GMR.GetHealth("player") < self.cfg.useHandOfProtectionMinHP
+            and GMR.IsCastable(spells.handOfProtection, "player")
+        then
+            self.dbgPrint("should cast hand of protection on player")
+            GMR.Cast(spells.handOfProtection, "player")
+            return
+        end
+
+        if spellKnown.divineProtection and GMR.GetHealth("player") < self.cfg.useDivineProtectionMinHP
+            and GMR.IsCastable(spells.divineProtection, "player")
+        then
+            self.dbgPrint("should cast divine protection on player")
+            GMR.Cast(spells.divineProtection, "player")
+            return
+        end
     end
 
     if self.state.defaultBlessingKnown and not HasBuffClassed("player", self.state.defaultBlessingBuff)
@@ -678,7 +708,7 @@ end
 --- @return number index
 function Rotation:shouldCleanse(unit, debuffNameToIndexMap)
     for debuff, index in pairs(debuffNameToIndexMap) do
-        if debuff == debuffs.livingBomb and GMR.GetNumPartyMembersAroundUnit(unit) == 0 then
+        if debuff == debuffs.livingBomb and GMR.GetNumPartyMembersAroundUnit(unit, 20) == 0 then
             return index
         end
     end
@@ -883,6 +913,36 @@ function Rotation:executeAuraChange()
         GMR.Cast(self.state.defaultAura, "player")
         return true
     end
+    --
+    --if not GMR.HasBuff("player", self.state.defaultAura, true) then
+    --    for _, cfgIndex in ipairs(self.cfg.defaultAuraChangeIfAlreadyExist) do
+    --        if cfgIndex == 1 and spellKnown.devotionAura and not GMR.HasBuff("player", spells.devotionAura)
+    --            and GMR.IsCastable(spells.devotionAura, "player")
+    --        then
+    --            self.dbgPrint("should cast devotion aura as reserve aura")
+    --            GMR.Cast(spells.devotionAura, "player")
+    --            return true
+    --        elseif cfgIndex == 2 and spellKnown.retributionAura and not GMR.HasBuff("player", spells.retributionAura)
+    --            and GMR.IsCastable(spells.retributionAura, "player")
+    --        then
+    --            self.dbgPrint("should cast retribution aura as reserve aura")
+    --            GMR.Cast(spells.retributionAura, "player")
+    --            return true
+    --        elseif cfgIndex == 3 and spellKnown.concentrationAura and not GMR.HasBuff("player", spells.concentrationAura)
+    --            and GMR.IsCastable(spells.concentrationAura, "player")
+    --        then
+    --            self.dbgPrint("should cast concentration aura as reserve aura")
+    --            GMR.Cast(spells.concentrationAura, "player")
+    --            return true
+    --        elseif cfgIndex == 5 and spellKnown.frostResistanceAura and not GMR.HasBuff("player", spells.frostResistanceAura)
+    --            and GMR.IsCastable(spells.frostResistanceAura, "player")
+    --        then
+    --            self.dbgPrint("should cast frost resistance aura as reserve aura")
+    --            GMR.Cast(spells.frostResistanceAura, "player")
+    --            return true
+    --        end
+    --    end
+    --end
 
     return false
 end
