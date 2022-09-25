@@ -1,3 +1,20 @@
+--This file is part of the AmsTaFFix' GMR plugins/profiles distribution
+--(https://github.com/AmsTaFFix/gmr-stuff).
+--Copyright (C) 2022 Nikita Sapogov
+--
+--This program is free software: you can redistribute it and/or modify
+--it under the terms of the GNU General Public License as published by
+--the Free Software Foundation, either version 3 of the License, or
+--(at your option) any later version.
+--
+--This program is distributed in the hope that it will be useful,
+--but WITHOUT ANY WARRANTY; without even the implied warranty of
+--MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+--GNU General Public License for more details.
+--
+--You should have received a copy of the GNU General Public License
+--along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 ---@class AmstLib
 amstlib = {}
 ---@type table<string, AmstLibCombatRotation>
@@ -35,6 +52,15 @@ amstlib.CONST.SPELL = {
     frostResistanceAura = GetSpellInfo(19898),
     divineProtection = GetSpellInfo(498),
     handOfProtection = GetSpellInfo(5599),
+    demonsBite = GetSpellInfo(162243),
+    chaosStrike = GetSpellInfo(162794),
+    immolationAura = GetSpellInfo(258920),
+    eyeBeam = GetSpellInfo(198013),
+    annihilation = GetSpellInfo(201427),
+    deathSweep = GetSpellInfo(210152),
+    bladeDance = GetSpellInfo(188499),
+    glaiveTempest = GetSpellInfo(342817),
+    sinfulBrand = GetSpellInfo(317009),
 }
 amstlib.CONST.SPELL_KNOWN = {
     exorcism = GMR.IsSpellKnown(amstlib.CONST.SPELL.exorcism),
@@ -67,6 +93,15 @@ amstlib.CONST.SPELL_KNOWN = {
     frostResistanceAura = GMR.IsSpellKnown(amstlib.CONST.SPELL.frostResistanceAura),
     divineProtection = GMR.IsSpellKnown(amstlib.CONST.SPELL.divineProtection),
     handOfProtection = GMR.IsSpellKnown(amstlib.CONST.SPELL.handOfProtection),
+    demonsBite = GMR.IsSpellKnown(amstlib.CONST.SPELL.demonsBite),
+    chaosStrike = GMR.IsSpellKnown(amstlib.CONST.SPELL.chaosStrike),
+    immolationAura = GMR.IsSpellKnown(amstlib.CONST.SPELL.immolationAura),
+    eyeBeam = GMR.IsSpellKnown(amstlib.CONST.SPELL.eyeBeam),
+    annihilation = GMR.IsSpellKnown(amstlib.CONST.SPELL.annihilation),
+    deathSweep = GMR.IsSpellKnown(amstlib.CONST.SPELL.deathSweep),
+    bladeDance = GMR.IsSpellKnown(amstlib.CONST.SPELL.bladeDance),
+    glaiveTempest = GMR.IsSpellKnown(amstlib.CONST.SPELL.glaiveTempest),
+    sinfulBrand = GMR.IsSpellKnown(amstlib.CONST.SPELL.sinfulBrand),
 }
 amstlib.CONST.BUFF = {
     theArtOfWar = GetSpellInfo(59578),
@@ -86,6 +121,13 @@ amstlib.CONST.BUFF = {
     crusaderAura = GetSpellInfo(32223),
     shadowResistanceAura = GetSpellInfo(27151),
     frostResistanceAura = GetSpellInfo(19898),
+    metamorphosis = GetSpellInfo(162264),
+}
+amstlib.CONST.DEBUFF = {
+    sinfulBrand = GetSpellInfo(317009),
+}
+amstlib.CONST.INVENTORY = {
+
 }
 
 amstlib.CONST.CLASS = {
@@ -181,13 +223,13 @@ function AmstLibCombatRotation:printDbg(msg)
         return
     end
 
-    GMR.Print(self.state.msgPrefix .. "[DEBUG] " .. msg)
+    GMR.Print(self.state.msgPrefix .. "[DEBUG] " .. tostring(msg))
 end
 
 ---@param msg string
 ---@return void
 function AmstLibCombatRotation:printError(msg)
-    GMR.Print(self.state.msgPrefix .. "[ERROR] " .. msg)
+    GMR.Print(self.state.msgPrefix .. "[ERROR] " .. tostring(msg))
 end
 
 function AmstLibCombatRotation:getConfig()
@@ -293,4 +335,34 @@ function AmstLibCombatRotation:initialize(version, checkFunc, rotationCreateFunc
 
     self:print("Rotation fully initialized and turned on.")
     return
+end
+
+amstlib.Util = {}
+---@param unit string|userdata
+---@param buff string
+---@param byPlayer boolean
+---@return number
+function amstlib.Util.GetBuffExpiration(unit, buff, byPlayer)
+    if GMR.GetBuffExpiration then
+        return GMR.GetBuffExpiration(unit, buff, byPlayer)
+    end
+
+    local spellName, expiration
+    local byPlayer = byPlayer or false
+    for i = 1, 20 do
+        if byPlayer == true then
+            spellName, _, _, _, _, expiration = GMR.UnitBuff(unit, i, nil, "player")
+        else
+            spellName, _, _, _, _, expiration = GMR.UnitBuff(unit, i)
+        end
+        if spellName and spellName == buff then
+            if expiration - GMR.GetTime() > 0 then
+                return expiration - GMR.GetTime()
+            elseif expiration == 0 then
+                return 99999
+            end
+        end
+    end
+
+    return 0
 end
