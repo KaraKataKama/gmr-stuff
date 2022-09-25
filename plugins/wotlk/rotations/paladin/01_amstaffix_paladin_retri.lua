@@ -20,8 +20,8 @@ local Config = {
 
     useHandOfReckoningToMakeDamage = true,
 
-    defaultAuraToUse = 2, -- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Shadow Resistance Aura; 5:Frost Resistance Aura
-    defaultAuraChangeIfAlreadyExist = {1,3,5},
+    defaultAuraToUse = 2, -- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Shadow Resistance Aura; 5:Frost Resistance Aura; 6:Fire Resistance Aura
+    defaultAuraChangeIfAlreadyExist = {1,3,5}, -- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Shadow Resistance Aura; 5:Frost Resistance Aura; 6:Fire Resistance Aura
     defaultBlessingToUse = 1, -- 1:Blessing of Might; 2:Blessing of Kings
     defaultSealToUse = 1, -- 1:Seal of Righteousness; 2:Seal of Justice; 3:Seal of Light; 4:Seal of Wisdom; 5:Seal of Command
 
