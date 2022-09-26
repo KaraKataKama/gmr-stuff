@@ -16,25 +16,39 @@
 --along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 local ID = "CR>DH/H"
-local LINK = "https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/plugins/wotlk/rotations/paladin/02_amstaffix_paladin_retri_rotation.lua"
+local LIB_LINK = "https://github.com/AmsTaFFix/gmr-stuff/blob/main/plugins/wotlk%2Bclassic%2Bretail/custom/00_amstlib.lua"
+local ROTATION_LINK = "https://github.com/AmsTaFFix/gmr-stuff/blob/main/plugins/retail/rotations/demonhunter/02_amstaffix_demonhunter_havoc_rotation.lua"
 ---@type DemonHunterConfig
 local Config = {
     ---Toggle debug mode. Turn on, if you encounter some issues and want to deal with it, or record a video and send
     ---to author.
-    debug = true,
+    debug = false,
     ---Use standard CombatRotation pluggable function. Change only if you know what you are doing.
     useCombatRotationLauncher = true,
     ---Use online loading feature to get last updates
-    onlineLoad = false,
+    onlineLoad = true,
 }
 
 do
-    local ok, err = pcall(function()
-        local cr = amstlib:getCombatRotation(ID)
-        cr:prepare(Config)
-        cr:load(LINK)
-    end)
-    if not ok then
-        GMR.Print(ID .. "[ERROR] " .. err)
+    if Config.onlineLoad then
+        GMR.SendHttpRequest({
+            Url = LIB_LINK,
+            Method = "GET",
+            Callback = function(content)
+                RunScript(content)
+                if not amstlib then
+                    GMR.Print("AmsTaFF's Lib do not initialized properly")
+                    return
+                end
+
+                local cr = amstlib:getCombatRotation(ID)
+                cr:prepare(Config)
+                cr:load(ROTATION_LINK)
+                if not self:isInitialized() then
+                    self:printError("Rotation have not loaded properly!")
+                    self:printError("Content is: " .. content)
+                end
+            end
+        })
     end
 end
