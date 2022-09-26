@@ -44,10 +44,6 @@ do
                 local cr = amstlib:getCombatRotation(ID)
                 cr:prepare(Config)
                 cr:load(ROTATION_LINK)
-                if not self:isInitialized() then
-                    self:printError("Rotation have not loaded properly!")
-                    self:printError("Content is: " .. content)
-                end
             end
         })
     end
