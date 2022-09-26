@@ -394,7 +394,16 @@ function GMR.GetDirectoryFiles() end
 function GMR.GetDiscordWebhook() end
 function GMR.GetDiscoverFlightmasters() end
 function GMR.GetDisenchantableItem() end
-function GMR.GetDistance() end
+---Check distance
+---
+---Example:
+---	- GMR.GetDistance("player", attackable, ">", 8)
+---@param unit string|userdata
+---@param otherUnit string|userdata
+---@param operation string "<", "<=", ">", ">="
+---@param distance number
+---@return boolean
+function GMR.GetDistance(unit, otherUnit, operation, distance) end
 ---@param object1 string|userdata
 ---@param object2 string|userdata
 ---@return number The distance between object1 and object2
@@ -1457,7 +1466,9 @@ function GMR.UnitBuff(unit, index, unknownArg, buffOwnerUnit) end
 ---@return boolean
 function GMR.UnitCanAttack(unit, anotherUnit) end
 function GMR.UnitCanHeal() end
-function GMR.UnitCastingInfo() end
+---@param unit string|userdata
+---@return string, string, number, number, number, boolean, string, boolean, number name, text, texture, startTimeMS, endTimeMS, isTradeSkill, castID, notInterruptible, spellId
+function GMR.UnitCastingInfo(unit) end
 ---Wether units cast is < than timeInSec
 ---@param unit string|userdata
 ---@param timeInSec number
