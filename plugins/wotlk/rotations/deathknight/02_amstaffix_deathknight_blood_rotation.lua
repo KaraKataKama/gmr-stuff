@@ -352,8 +352,8 @@ function Rotation:execute()
 	end
 
 	if spellKnown.raiseDead and GetSpellCooldown(spells.raiseDead) > 0 then
-		local cooldown = GetSpellCooldown(spells.raiseDead) - GetTime()
-		if cooldown >= 50 and cooldown <= 60 and GMR.GetHealth("player") < self.cfg.minHPToUseDeathPact
+		local secondsLeftAfterCast = GetTime() - GetSpellCooldown(spells.raiseDead)
+		if secondsLeftAfterCast >= 45 and secondsLeftAfterCast <= 60 and GMR.GetHealth("player") < self.cfg.minHPToUseDeathPact
 			and GMR.IsCastable(spells.deathPact, "player")
 		then
 			self.dbgPrint("should cast Death Pact to heal")
