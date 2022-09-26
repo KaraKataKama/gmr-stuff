@@ -1,4 +1,6 @@
 # CHANGELOG:
+## v1.14.0
+- fixed death pact usage
 ## v1.13.0
 - refactored
 - finished my encryption tests

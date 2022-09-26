@@ -16,7 +16,7 @@
 --along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 AMST_SHARE = AMST_SHARE or {}
-local VERSION = "v1.13.0"
+local VERSION = "v1.14.0"
 local printMsgPrefix = "[CR>DK/B|" .. VERSION .. "] "
 ---Print message with CR prefix
 ---@param msg string
