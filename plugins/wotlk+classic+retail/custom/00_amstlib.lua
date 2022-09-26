@@ -247,7 +247,7 @@ end
 ---@return boolean, string result and details
 function AmstLibCombatRotation:load(link)
     if not self:isPrepared() then
-        return false, "rotation not prepared, should call prepare() func first"
+       error("rotation not prepared, should call prepare() func first")
     end
 
     if self.state.config.onlineLoad then
