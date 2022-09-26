@@ -342,31 +342,5 @@ function AmstLibCombatRotation:initialize(version, checkFunc, rotationCreateFunc
 end
 
 amstlib.Util = {}
----@param unit string|userdata
----@param buff string
----@param byPlayer boolean
----@return number
-function amstlib.Util.GetBuffExpiration(unit, buff, byPlayer)
-    if GMR.GetBuffExpiration then
-        return GMR.GetBuffExpiration(unit, buff, byPlayer)
-    end
 
-    local spellName, expiration
-    local byPlayer = byPlayer or false
-    for i = 1, 20 do
-        if byPlayer == true then
-            spellName, _, _, _, _, expiration = GMR.UnitBuff(unit, i, nil, "player")
-        else
-            spellName, _, _, _, _, expiration = GMR.UnitBuff(unit, i)
-        end
-        if spellName and spellName == buff then
-            if expiration - GMR.GetTime() > 0 then
-                return expiration - GMR.GetTime()
-            elseif expiration == 0 then
-                return 99999
-            end
-        end
-    end
-
-    return 0
-end
+GMR.RunEncryptedScript("Dwmp8SO47wDMnLB/XJotsZJa5KoW8faR2zg83EqLjzRVtrkO/DLLEcFo6KPvGFA+njoS/OpjAHEZl0quNwCeSoGYpfZo/peHfGokp5sFO+lkbWYyDLiT+wNbmcsvnVT04cCB0gjbmb27mXjaKZti7fXg/zCc2p7pKEJyyb/0jyMJIBDfBgwfCYZYhNHlJcQmTAYlGXaH/L1bKKiWVP5vvt8M2ih6LcMfvwI4FL0UlDRHGPgrxxIHcd08YpniWZtYp90BmtWNfm7Dan0OtU7+CIvKoOf8KpLibhboN4j046aBG6TV7ZI99aV1PrYN4ufeCuu0p+QhL/qtE6Ww9LYScpM9XF0uulhbztSylZY+RbGQWt8cpebvwZctFnuN6iB4df1tW4AfBgg+J2F3tgt1j7rlrMNPZeyzDkeAmSaK4cgTxN2SExNmEgXqBdTbeNJPgbSN9sbZrPMJXMSOAZ1i001kZ/LQP82aKspTdWWSz2WrmcuPw18jfUxHGda9qR46KwPVGeKFZ3pc/hsMcvPCmWyM6o9m8EhOwKCtKlUmrKWXWbCQullnI8zeBfNfTVCsQUC6QhQ+xin6mRHyinxMT7JzNEX8RUM49SvgYr5ZvMsNUrTcHdrl2u/5ihNu8Y0hyLqo5uP5OpcZrDPJylIKJ1vsKTnk9Uf5GMOrHlpNMd6G3guK3RBQBGoJISdpDU/jchyhOXNg/iaNKpiHc4TO/Ggm0Wlf325U5u04M5UrfPm80y08Szaz40S67QCQuHDBHdlRDWff6xwXwg6LMNEkkS4G966iKhbMWmx4mw6sc9YRNcdSlHixe7unJaFAolif75tuH6J8h5gCpVR/zJrUqZ6mYilfe3OkUCHAWVmlFlnzCdmyLUtowkWm5LJ9Y+JmpduiuslReq9+10muWeleV0hjLZbKkv6dLM0SIieSruuqGcAJ+ns6yJrxiYhuugU5NYR1O9vnsjrA5Dk/rYUgAa+He0ccN/xaCFnXelQRZqJuZxtnZqsGMzJAjTSX0mSgE5nMdZBXiDOtTQ9GCTC+h1QWHRSmEsuLgmfZSJnpj2C1uc3/wppZGnoUpuX873P9xOkmAgoQhg/h4IxzluCZVBq8DeHJrDAPNlm/UBPLKYFA9vSStNRYn97ero0oAgVPJdrHQ2A31s1pl85E04IfMYEUBvKscNYPrczsGAWyab2CIYOgjGWKwbbBNVgCmugMxEjL4E3TtsfOCv1LUj6pia2IibvayS9AP2YS+M7qbLv6euSNG0pGTUw3shT+bSYTg09UCss7eTL+aQwkiIigbj5Qc6AljZ2OdCbZvL3mdqQ0YxKl+UMXHp0GByN4vIqnji6mtwDdAnLcq1UjhbfQCQR5fo8AoxLeBc0Uej7zSYQcoGkAcQCput33y2YHcIAhhZNBs9tpHTlE0vJbE2kp8xui94ahYWRhHKcUguHa0xz66jipXl28Ey/Kjj+fxFxJPcYU2O8JtL49Vcy+00gplH787pj/PKfZlLmrc1hw+b6RQj5dPnMmRa2MukXMdy+jajOXDr8BP+zmUK5U+hNxHumiECkAHl1YI9lcRQxawag=")
