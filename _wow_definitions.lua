@@ -1,3 +1,4 @@
 ---Executes a string of Lua code
+---@param scriptAsText string
 ---@return void
-function RunScript()end
+function RunScript(scriptAsText)end
