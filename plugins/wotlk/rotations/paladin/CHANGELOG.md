@@ -4,6 +4,7 @@
 - added usage of divine protection 
 - added usage hand of protection
 - added smart aura changes
+- added group buffing
 ## v1.3.0
 - added feature to dynamically change auras
 - rotation is responsible for aura changes
