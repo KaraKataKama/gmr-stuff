@@ -41,11 +41,9 @@ do
                     return
                 end
 
-                C_Timer.After(1, function()
-                    local cr = amstlib:getCombatRotation(ID)
-                    cr:prepare(Config)
-                    cr:load(ROTATION_LINK)
-                end)
+                local cr = amstlib:getCombatRotation(ID)
+                cr:prepare(Config)
+                cr:load(ROTATION_LINK)
             end
         })
     end
