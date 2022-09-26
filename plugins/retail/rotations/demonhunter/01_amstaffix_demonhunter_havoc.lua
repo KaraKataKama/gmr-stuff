@@ -16,8 +16,8 @@
 --along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 local ID = "CR>DH/H"
-local LIB_LINK = "https://github.com/AmsTaFFix/gmr-stuff/blob/main/plugins/wotlk%2Bclassic%2Bretail/custom/00_amstlib.lua"
-local ROTATION_LINK = "https://github.com/AmsTaFFix/gmr-stuff/blob/main/plugins/retail/rotations/demonhunter/02_amstaffix_demonhunter_havoc_rotation.lua"
+local LIB_LINK = "https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/plugins/wotlk%2Bclassic%2Bretail/custom/00_amstlib.lua"
+local ROTATION_LINK = "https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/plugins/retail/rotations/demonhunter/02_amstaffix_demonhunter_havoc_rotation.lua"
 ---@type DemonHunterConfig
 local Config = {
     ---Toggle debug mode. Turn on, if you encounter some issues and want to deal with it, or record a video and send
@@ -33,7 +33,7 @@ do
     if Config.onlineLoad then
         GMR.SendHttpRequest({
             Url = LIB_LINK,
-            Method = "GET",
+            Method = "Get",
             Callback = function(content)
                 RunScript(content)
                 if not amstlib then
@@ -41,9 +41,11 @@ do
                     return
                 end
 
-                local cr = amstlib:getCombatRotation(ID)
-                cr:prepare(Config)
-                cr:load(ROTATION_LINK)
+                C_Timer.After(1, function()
+                    local cr = amstlib:getCombatRotation(ID)
+                    cr:prepare(Config)
+                    cr:load(ROTATION_LINK)
+                end)
             end
         })
     end
