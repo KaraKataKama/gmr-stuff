@@ -251,11 +251,14 @@ function AmstLibCombatRotation:load(link)
     end
 
     if self.state.config.onlineLoad then
+        GMR.Print("before request")
         GMR.SendHttpRequest({
             Url = link,
-            Method = "GET",
+            Method = "Get",
             Callback = function(content)
+                GMR.Print("after request 1")
                 RunScript(content)
+                GMR.Print("after request 2")
                 if not self:isInitialized() then
                     self:printError("Rotation have not loaded properly!")
                     self:printError("Content is: " .. content)
