@@ -727,6 +727,7 @@ function GMR.GetSubdirectories() end
 function GMR.GetSurroundingWaterXYZ() end
 function GMR.GetTexture() end
 function GMR.GetThreat() end
+---@return number
 function GMR.GetTime() end
 function GMR.GetTradeRecipient() end
 function GMR.GetTrainingOption() end
@@ -1335,6 +1336,9 @@ function GMR.ResurrectPartyMember() end
 function GMR.Revive() end
 ---@param str string
 function GMR.RunEncoded(str) end
+---@param str string
+---@return void
+function GMR.RunEncryptedScript(str) end
 ---@param text string
 ---@return void
 function GMR.RunMacroText(text) end
@@ -1443,7 +1447,11 @@ function GMR.TurnLeftStop() end
 function GMR.TurnRightStart() end
 function GMR.TurnRightStop() end
 function GMR.UnitAffectingCombat() end
-function GMR.UnitBuff() end
+---@param unit string|userdata
+---@param index number
+---@param unknownArg any Maybe someone can tell about that arg
+---@param buffOwnerUnit string|userdata owner of the buff
+function GMR.UnitBuff(unit, index, unknownArg, buffOwnerUnit) end
 ---@param unit string|userdata
 ---@param anotherUnit string|userdata
 ---@return boolean
