@@ -61,6 +61,7 @@ amstlib.CONST.SPELL = {
     bladeDance = GetSpellInfo(188499),
     glaiveTempest = GetSpellInfo(342817),
     sinfulBrand = GetSpellInfo(317009),
+    doorOfShadows = GetSpellInfo(300728),
 }
 amstlib.CONST.SPELL_KNOWN = {
     exorcism = GMR.IsSpellKnown(amstlib.CONST.SPELL.exorcism),
@@ -102,6 +103,7 @@ amstlib.CONST.SPELL_KNOWN = {
     bladeDance = GMR.IsSpellKnown(amstlib.CONST.SPELL.bladeDance),
     glaiveTempest = GMR.IsSpellKnown(amstlib.CONST.SPELL.glaiveTempest),
     sinfulBrand = GMR.IsSpellKnown(amstlib.CONST.SPELL.sinfulBrand),
+    doorOfShadows = GMR.IsSpellKnown(amstlib.CONST.SPELL.doorOfShadows),
 }
 amstlib.CONST.BUFF = {
     theArtOfWar = GetSpellInfo(59578),
@@ -126,8 +128,10 @@ amstlib.CONST.BUFF = {
 amstlib.CONST.DEBUFF = {
     sinfulBrand = GetSpellInfo(317009),
 }
-amstlib.CONST.INVENTORY = {
-
+amstlib.CONST.INVENTORY = {}
+amstlib.CONST.INVENTORY.SLOT_ID = {
+    TRINKET_1 = 13,
+    TRINKET_2 = 14,
 }
 
 amstlib.CONST.CLASS = {
