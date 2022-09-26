@@ -30,6 +30,7 @@ local Config = {
 }
 
 do
+    local msgPrefix = "[" .. ID .. "] "
     if Config.onlineLoad then
         GMR.SendHttpRequest({
             Url = LIB_LINK,
@@ -37,7 +38,7 @@ do
             Callback = function(content)
                 RunScript(content)
                 if not amstlib then
-                    GMR.Print("AmsTaFFix' Lib do not initialized properly")
+                    GMR.Print(msgPrefix.."AmsTaFFix' Lib do not initialized properly")
                     return
                 end
 
@@ -46,5 +47,10 @@ do
                 cr:load(ROTATION_LINK)
             end
         })
+    else
+        GMR.Print(msgPrefix.."Offline loading of rotation initiated")
+        local cr = amstlib:getCombatRotation(ID)
+        cr:prepare(Config)
+        cr:load(ROTATION_LINK)
     end
 end
