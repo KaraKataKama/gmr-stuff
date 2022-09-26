@@ -255,7 +255,7 @@ function AmstLibCombatRotation:load(link)
             Url = link,
             Method = "GET",
             Callback = function(content)
-                GMR.RunString(content)
+                RunScript(content)
                 if not self:isInitialized() then
                     self:printError("Rotation have not loaded properly!")
                     self:printError("Content is: " .. content)
