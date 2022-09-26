@@ -37,7 +37,7 @@ do
             Callback = function(content)
                 RunScript(content)
                 if not amstlib then
-                    GMR.Print("AmsTaFF's Lib do not initialized properly")
+                    GMR.Print("AmsTaFFix' Lib do not initialized properly")
                     return
                 end
 
