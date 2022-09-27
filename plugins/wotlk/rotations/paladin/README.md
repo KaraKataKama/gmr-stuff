@@ -25,7 +25,9 @@
   - Blessing of freedom
   - Hand Of Protection
   - Divine Protection
-- drop `01_amstaffix_paladin_retri.lua` into ` addons\Wrath of the Lichking\Plugins` directory
+- drop `01_amstaffix_paladin_retri.lua` into 
+  - HWT: `{HWT_Dir}/addons/Wrath of the Lichking/Plugins/`
+  - Tinkr: `{Tinkr_Dir}/scripts/GMR/Plugins/`
 ## Backlog
 - ~~level up my paladin to lvl 70 and check all skills~~
 - ~~make a top retri DPS~~ (DM if it not)

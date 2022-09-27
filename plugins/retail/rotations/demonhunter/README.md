@@ -9,7 +9,9 @@ DM me **AmsTaFFix#0047** and i'll make that rotation more universal :)
 - online update
 ## Installation
 - turn off every offensive spell in GMR's Spell tab
-- drop `01_amstaffix_demonhunter_havoc.lua` into ` addons\Shadowlands\Plugins` directory
+- drop `01_amstaffix_demonhunter_havoc.lua` into
+    - HWT: `{HWT_Dir}/addons/Shadowlands/Plugins/`
+    - Tinkr: `{Tinkr_Dir}/scripts/GMR/Plugins/`
 ## Backlog
 - ??? (DM me your suggestions)
 ## Tuning

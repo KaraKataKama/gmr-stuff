@@ -1,7 +1,9 @@
 # Death Knight Rotation
 ## Installation
 - turn off all spells in Spells tab
-- drop `01_amstaffix_deathknight_blood.lua` into ` addons\Wrath of the Lichking\Plugins` directory
+- drop `01_amstaffix_deathknight_blood.lua` into
+  - HWT: `{HWT_Dir}/addons/Wrath of the Lichking/Plugins/`
+  - Tinkr: `{Tinkr_Dir}/scripts/GMR/Plugins/`
 ## Backlog
 - ~~Add possibility to online update of this rotation~~
 - ~~Add cast interrupts~~
