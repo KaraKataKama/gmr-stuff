@@ -1,4 +1,9 @@
 # CHANGELOG:
+## v1.5.0
+- fixed buff and cleans mods in 5-party
+- optimized head of reckoning usage
+- optimized consecrations
+- optimized seals usage
 ## v1.4.0
 - added blessing of freedom usage
 - added usage of divine protection 

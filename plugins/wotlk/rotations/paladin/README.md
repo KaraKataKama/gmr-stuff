@@ -6,8 +6,8 @@
 - smart usage of hammer of wrath
 - dynamic usage of Aura
 - usage of Seals
-- smart group cleanse in PVP (BG tested)
-- smart Group buff (BG tested)
+- smart group cleanse (BG, dungeon tested)
+- smart group buff (BG, dungeon tested)
 - online update
 
 ## Installation
