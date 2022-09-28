@@ -69,6 +69,7 @@ local spells = {
     sealOfLight = GetSpellInfo(20165),
     sealOfWisdom = GetSpellInfo(20166),
     sealOfCommand = GetSpellInfo(20375),
+    sealOfCorruption = GetSpellInfo(348704),
     greaterBlessingOfMight = GetSpellInfo(25916),
     greaterBlessingOfKings = GetSpellInfo(25898),
     shadowResistanceAura = GetSpellInfo(27151),
@@ -110,6 +111,7 @@ local spellKnown = {
     divineProtection = GMR.IsSpellKnown(spells.divineProtection),
     handOfProtection = GMR.IsSpellKnown(spells.handOfProtection),
     fireResistanceAura = GMR.IsSpellKnown(spells.fireResistanceAura),
+    sealOfCorruption = GMR.IsSpellKnown(spells.sealOfCorruption),
 }
 
 local buffs = {
@@ -121,6 +123,7 @@ local buffs = {
     sealOfLight = GetSpellInfo(20165),
     sealOfWisdom = GetSpellInfo(20166),
     sealOfCommand = GetSpellInfo(20375),
+    sealOfCorruption = GetSpellInfo(348704),
     greaterBlessingOfMight = GetSpellInfo(25916),
     greaterBlessingOfKings = GetSpellInfo(25898),
     battleShout = GetSpellInfo(2048),
@@ -317,18 +320,20 @@ local Config = {
     useJudgmentCooldown = 10,
 
     useHandOfReckoningToMakeDamage = true,
+    useHandOfReckoningInInstance = false,
 
     defaultAuraToUse = 2, -- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Shadow Resistance Aura; 5:Frost Resistance Aura; 6:Fire Resistance Aura
     defaultAuraChangeIfAlreadyExist = { 1, 3 }, -- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Shadow Resistance Aura; 5:Frost Resistance Aura; 6:Fire Resistance Aura
     defaultBlessingToUse = 1, -- 1:Blessing of Might; 2:Blessing of Kings
-    defaultSealToUse = 1, -- 1:Seal of Righteousness; 2:Seal of Justice; 3:Seal of Light; 4:Seal of Wisdom; 5:Seal of Command
+    defaultSealToUse = 1, -- 1:Seal of Righteousness; 2:Seal of Justice; 3:Seal of Light; 4:Seal of Wisdom; 5:Seal of Command; 6:Seal of Corruption;
+    defaultSealDoNotSwitchList = { 6 }, -- 1:Seal of Righteousness; 2:Seal of Justice; 3:Seal of Light; 4:Seal of Wisdom; 5:Seal of Command; 6:Seal of Corruption;
 
     useCrusaderAuraWhileMounted = true,
     useCrusaderAuraWhileMounterMinDistance = 50,
 
     useBlessingOfFreedom = true,
 
-    groupBuffModEnabled = true,
+    groupBuffModEnabled = false,
     groupBuffModMinMana = 70,
 
     useDivineProtectionMinHP = 70,
@@ -356,8 +361,6 @@ function AuraSettings:new(cfgIndex, spell, spellKnown, buff)
     return o
 end
 
--- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Shadow Resistance Aura; 5:Frost Resistance Aura
-
 ---@type table<number, PaladinAuraSettings>
 local cfgIndexToAuraSettingsMap = {
     [1] = AuraSettings:new(1, spells.devotionAura, spellKnown.devotionAura, buffs.devotionAura),
@@ -366,6 +369,37 @@ local cfgIndexToAuraSettingsMap = {
     [4] = AuraSettings:new(4, spells.shadowResistanceAura, spellKnown.shadowResistanceAura, buffs.shadowResistanceAura),
     [5] = AuraSettings:new(5, spells.frostResistanceAura, spellKnown.frostResistanceAura, buffs.frostResistanceAura),
     [6] = AuraSettings:new(6, spells.fireResistanceAura, spellKnown.fireResistanceAura, buffs.fireResistanceAura)
+}
+
+---@class PaladinSealSettings
+local PaladinSealSettings = {
+    cfgIndex = 0,
+    spell = "",
+    spellKnown = "",
+    buff = "",
+}
+
+---@return PaladinSealSettings
+function PaladinSealSettings:new(cfgIndex, spell, spellKnown, buff)
+    local o = {
+        cfgIndex = cfgIndex,
+        spell = spell,
+        spellKnown = spellKnown,
+        buff = buff,
+    }
+    setmetatable(o, self)
+    self.__index = self
+    return o
+end
+
+---@type table<number, PaladinSealSettings>
+local cfgIndexToSealSettingsMap = {
+    [1] = PaladinSealSettings:new(1, spells.sealOfRighteousness, spellKnown.sealOfRighteousness, buffs.sealOfRighteousness),
+    [2] = PaladinSealSettings:new(2, spells.sealOfJustice, spellKnown.sealOfJustice, buffs.sealOfJustice),
+    [3] = PaladinSealSettings:new(3, spells.sealOfLight, spellKnown.sealOfLight, buffs.sealOfLight),
+    [4] = PaladinSealSettings:new(4, spells.sealOfWisdom, spellKnown.sealOfWisdom, buffs.sealOfWisdom),
+    [5] = PaladinSealSettings:new(5, spells.sealOfCommand, spellKnown.sealOfCommand, buffs.sealOfCommand),
+    [6] = PaladinSealSettings:new(6, spells.sealOfCorruption, spellKnown.sealOfCorruption, buffs.sealOfCorruption),
 }
 
 function Config:new()
@@ -401,9 +435,10 @@ local State = {
     defaultBlessingKnown = spellKnown.blessingOfMight,
     defaultBlessingBuff = buffs.blessingOfMight,
 
-    defaultSealSpell = spells.sealOfRighteousness,
-    defaultSealKnown = spellKnown.sealOfRighteousness,
-    defaultSealBuff = buffs.sealOfRighteousness,
+    ---@type PaladinSealSettings
+    defaultSeal = PaladinSealSettings:new(0, "", false, ""),
+    ---@type PaladinSealSettings[]
+    ignoredSeals = {}
 }
 
 function State:new()
@@ -437,22 +472,14 @@ function State:determine(cfg)
         self.defaultBlessingBuff = buffs.blessingOfKings
     end
 
-    if cfg.defaultSealToUse == 2 and spellKnown.sealOfJustice then
-        self.defaultSealSpell = spells.sealOfJustice
-        self.defaultSealKnown = spellKnown.sealOfJustice
-        self.defaultSealBuff = buffs.sealOfJustice
-    elseif cfg.defaultSealToUse == 3 and spellKnown.sealOfLight then
-        self.defaultSealSpell = spells.sealOfLight
-        self.defaultSealKnown = spellKnown.sealOfLight
-        self.defaultSealBuff = buffs.sealOfLight
-    elseif cfg.defaultSealToUse == 4 and spellKnown.sealOfWisdom then
-        self.defaultSealSpell = spells.sealOfWisdom
-        self.defaultSealKnown = spellKnown.sealOfWisdom
-        self.defaultSealBuff = buffs.sealOfWisdom
-    elseif cfg.defaultSealToUse == 5 and spellKnown.sealOfCommand then
-        self.defaultSealSpell = spells.sealOfCommand
-        self.defaultSealKnown = spellKnown.sealOfCommand
-        self.defaultSealBuff = buffs.sealOfCommand
+    if cfgIndexToSealSettingsMap[cfg.defaultSealToUse] and cfgIndexToSealSettingsMap[cfg.defaultSealToUse].spellKnown then
+        self.defaultSeal = cfgIndexToSealSettingsMap[cfg.defaultSealToUse]
+    end
+
+    for _, sealCfgIndex in ipairs(cfg.defaultSealDoNotSwitchList) do
+        if cfgIndexToSealSettingsMap[sealCfgIndex] and cfgIndexToSealSettingsMap[sealCfgIndex].spellKnown then
+            table.insert(self.ignoredSeals, cfgIndexToSealSettingsMap[sealCfgIndex])
+        end
     end
 end
 
@@ -573,12 +600,21 @@ function Rotation:execute()
         return
     end
 
-    if self.state.defaultSealKnown and not GMR.HasBuff("player", self.state.defaultSealBuff)
-        and GMR.IsCastable(self.state.defaultSealSpell, "player")
+    if self.state.defaultSeal.spellKnown and not GMR.HasBuff("player", self.state.defaultSeal.buff)
+        and GMR.IsCastable(self.state.defaultSeal.spell, "player")
     then
-        self.dbgPrint("should cast default seal '" .. self.state.defaultSealSpell .. "' on player")
-        GMR.Cast(self.state.defaultSealSpell, "player")
-        return
+        local alreadyHasIgnoredSeal = false
+        for _, ignoreSeal in ipairs(self.state.ignoredSeals) do
+            if GMR.HasBuff("player", ignoreSeal.buff) then
+                alreadyHasIgnoredSeal = true
+                break
+            end
+        end
+        if not alreadyHasIgnoredSeal then
+            self.dbgPrint("should cast default seal '" .. self.state.defaultSeal.spell .. "' on player")
+            GMR.Cast(self.state.defaultSeal.spell, "player")
+            return
+        end
     end
 
     local isTargetAttackable = GMR.IsAlive("target") and GMR.UnitCanAttack("player", "target")
@@ -657,6 +693,7 @@ function Rotation:execute()
     end
 
     if isTargetAttackable and self.cfg.useHandOfReckoningToMakeDamage and spellKnown.handOfReckoning
+        and (self.cfg.useHandOfReckoningInInstance or (not self.cfg.useHandOfReckoningInInstance and not IsInInstance()))
         and not GMR.UnitIsPlayer("target") and not GMR.UnitIsUnit("targettarget", "player")
         and GMR.IsCastable(spells.handOfReckoning, "target")
     then
@@ -665,7 +702,7 @@ function Rotation:execute()
         return
     end
 
-    if spellKnown.consecrations and GMR.GetNumEnemies("player", 10) >= self.cfg.useConsecrationsMinEnemies
+    if spellKnown.consecrations and not GMR.IsMoving() and GMR.GetNumEnemies("player", 10) >= self.cfg.useConsecrationsMinEnemies
         and GMR.IsCastable(spells.consecrations, "player")
     then
         self.dbgPrint("should use consecrations")
@@ -832,7 +869,7 @@ function Rotation:executeGroupCleanse()
         return false
     end
 
-    if not UnitInRaid("player") or not UnitInParty("player") then
+    if not UnitInRaid("player") and not UnitInParty("player") then
         return false
     end
 
@@ -887,7 +924,7 @@ function Rotation:executeGroupBuff()
         return false
     end
 
-    if not UnitInRaid("player") or not UnitInParty("player") then
+    if not UnitInRaid("player") and not UnitInParty("player") then
         return false
     end
 
