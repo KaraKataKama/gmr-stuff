@@ -17,7 +17,7 @@
 
 AMST_SHARE = AMST_SHARE or {}
 AMST_SHARE["CR>P/R.LOADED"] = true
-local VERSION = "v1.5.0"
+local VERSION = "v1.6.0"
 local printMsgPrefix = "[CR>P/R|" .. VERSION .. "] "
 
 ---Print message with CR prefix
@@ -64,6 +64,7 @@ local spells = {
     blessingOfFreedom = GetSpellInfo(1044),
     blessingOfMight = GetSpellInfo(19837),
     blessingOfKings = GetSpellInfo(20217),
+    blessingOfWisdom = GetSpellInfo(27142),
     sealOfRighteousness = GetSpellInfo(21084),
     sealOfJustice = GetSpellInfo(20164),
     sealOfLight = GetSpellInfo(20165),
@@ -77,6 +78,9 @@ local spells = {
     divineProtection = GetSpellInfo(498),
     handOfProtection = GetSpellInfo(5599),
     fireResistanceAura = GetSpellInfo(27153),
+    holyLight = GetSpellInfo(25292),
+    flashOfLight = GetSpellInfo(19943),
+    holyShock = GetSpellInfo(33072),
 }
 
 local spellKnown = {
@@ -99,6 +103,7 @@ local spellKnown = {
     blessingOfFreedom = GMR.IsSpellKnown(spells.blessingOfFreedom),
     blessingOfMight = GMR.IsSpellKnown(spells.blessingOfMight),
     blessingOfKings = GMR.IsSpellKnown(spells.blessingOfKings),
+    blessingOfWisdom = GMR.IsSpellKnown(spells.blessingOfWisdom),
     sealOfRighteousness = GMR.IsSpellKnown(spells.sealOfRighteousness),
     sealOfJustice = GMR.IsSpellKnown(spells.sealOfJustice),
     sealOfLight = GMR.IsSpellKnown(spells.sealOfLight),
@@ -112,6 +117,9 @@ local spellKnown = {
     handOfProtection = GMR.IsSpellKnown(spells.handOfProtection),
     fireResistanceAura = GMR.IsSpellKnown(spells.fireResistanceAura),
     sealOfCorruption = GMR.IsSpellKnown(spells.sealOfCorruption),
+    holyLight = GMR.IsSpellKnown(spells.holyLight),
+    flashOfLight = GMR.IsSpellKnown(spells.flashOfLight),
+    holyShock = GMR.IsSpellKnown(spells.holyShock),
 }
 
 local buffs = {
@@ -134,6 +142,8 @@ local buffs = {
     shadowResistanceAura = GetSpellInfo(27151),
     frostResistanceAura = GetSpellInfo(19898),
     fireResistanceAura = GetSpellInfo(27153),
+    infusionOfLight = GetSpellInfo(54149),
+    blessingOfWisdom = GetSpellInfo(27142),
 }
 
 local buffSameClassLists = {
@@ -312,11 +322,15 @@ local Config = {
     onlineLoad = true,
     consumeArtOfWarFlashLightMinHp = 80,
     consumeArtOfWarFlashLightIfAuraDepletedSoon = true,
+
+    useConsecrations = true,
     useConsecrationsMinEnemies = 2,
     useDivineStormMinEnemies = 2,
 
     groupCleanseModEnabled = false,
     useJudgmentType = 1, -- 1:Judgement of Light; 2:Judgement of Wisdom; 3:Judgement of Justice;
+    useJudgmentTryToCleave = true,
+    useJudgmentForDebuffOnly = false,
     useJudgmentCooldown = 10,
 
     useHandOfReckoningToMakeDamage = true,
@@ -324,7 +338,7 @@ local Config = {
 
     defaultAuraToUse = 2, -- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Shadow Resistance Aura; 5:Frost Resistance Aura; 6:Fire Resistance Aura
     defaultAuraChangeIfAlreadyExist = { 1, 3 }, -- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Shadow Resistance Aura; 5:Frost Resistance Aura; 6:Fire Resistance Aura
-    defaultBlessingToUse = 1, -- 1:Blessing of Might; 2:Blessing of Kings
+    defaultBlessingToUse = 1, -- 1:Blessing of Might; 2:Blessing of Kings; 3:Blessing of Wisdom
     defaultSealToUse = 1, -- 1:Seal of Righteousness; 2:Seal of Justice; 3:Seal of Light; 4:Seal of Wisdom; 5:Seal of Command; 6:Seal of Corruption;
     defaultSealDoNotSwitchList = { 6 }, -- 1:Seal of Righteousness; 2:Seal of Justice; 3:Seal of Light; 4:Seal of Wisdom; 5:Seal of Command; 6:Seal of Corruption;
 
@@ -338,6 +352,11 @@ local Config = {
 
     useDivineProtectionMinHP = 70,
     useHandOfProtectionMinHP = 40,
+
+    healModEnabled = false,
+    healModHolyLightHealAmount = 3200,
+    healModFlashOfLightHealAmount = 820,
+    healModHolyShockHealAmount = 1800,
 }
 
 ---@class PaladinAuraSettings
@@ -470,6 +489,10 @@ function State:determine(cfg)
         self.defaultBlessingSpell = spells.blessingOfKings
         self.defaultBlessingKnown = spellKnown.blessingOfKings
         self.defaultBlessingBuff = buffs.blessingOfKings
+    elseif cfg.defaultBlessingToUse == 3 and spellKnown.blessingOfWisdom then
+        self.defaultBlessingSpell = spells.blessingOfWisdom
+        self.defaultBlessingKnown = spellKnown.blessingOfWisdom
+        self.defaultBlessingBuff = buffs.blessingOfWisdom
     end
 
     if cfgIndexToSealSettingsMap[cfg.defaultSealToUse] and cfgIndexToSealSettingsMap[cfg.defaultSealToUse].spellKnown then
@@ -636,26 +659,29 @@ function Rotation:execute()
 
     -- Judgement
     if self.state.judgmentToUseKnown and GetSpellCooldown(self.state.judgmentToUse) == 0 and isTargetAttackable then
-        local unitToCast = nil
-        for i = 1, #GMR.Tables.Attackables do
-            local attackable = GMR.Tables.Attackables[i][1]
-            if GMR.ObjectExists(attackable) and GMR.IsCastable(self.state.judgmentToUse, attackable)
-                and GMR.GetDistance("player", attackable, "<", 10)
-                and not GMR.IsImmune(attackable)
-                and GMR.GetDebuffExpiration(attackable, self.state.judgmentToUseDebuff) < self.cfg.useJudgmentCooldown
-            then
-                unitToCast = attackable
-                break
+        if not self.cfg.useJudgmentForDebuffOnly or (self.cfg.useJudgmentForDebuffOnly
+            and not GMR.HasBuff("target", self.state.judgmentToUseDebuff, true))
+        then
+            local unitToCast = "target"
+            if self.cfg.useJudgmentTryToCleave then
+                for i = 1, #GMR.Tables.Attackables do
+                    local attackable = GMR.Tables.Attackables[i][1]
+                    if GMR.ObjectExists(attackable) and GMR.IsCastable(self.state.judgmentToUse, attackable)
+                        and GMR.GetDistance("player", attackable, "<", 10)
+                        and not GMR.IsImmune(attackable)
+                        and GMR.GetDebuffExpiration(attackable, self.state.judgmentToUseDebuff) < self.cfg.useJudgmentCooldown
+                    then
+                        unitToCast = attackable
+                        break
+                    end
+                end
             end
-        end
-        if not unitToCast and isTargetAttackable and GMR.GetDistance("player", "target", "<", 10) then
-            unitToCast = "target"
-        end
 
-        if unitToCast and GMR.IsCastable(self.state.judgmentToUse, unitToCast) then
-            self.dbgPrint("should cast default judgment '" .. self.state.judgmentToUse .. "'")
-            GMR.Cast(self.state.judgmentToUse, unitToCast)
-            return
+            if unitToCast and GMR.IsCastable(self.state.judgmentToUse, unitToCast) then
+                self.dbgPrint("should cast default judgment '" .. self.state.judgmentToUse .. "'")
+                GMR.Cast(self.state.judgmentToUse, unitToCast)
+                return
+            end
         end
     end
 
@@ -691,6 +717,9 @@ function Rotation:execute()
     if self:executeGroupCleanse() then
         return
     end
+    if self:executeHeal() then
+        return
+    end
 
     if isTargetAttackable and self.cfg.useHandOfReckoningToMakeDamage and spellKnown.handOfReckoning
         and (self.cfg.useHandOfReckoningInInstance or (not self.cfg.useHandOfReckoningInInstance and not IsInInstance()))
@@ -702,7 +731,8 @@ function Rotation:execute()
         return
     end
 
-    if spellKnown.consecrations and not GMR.IsMoving() and GMR.GetNumEnemies("player", 10) >= self.cfg.useConsecrationsMinEnemies
+    if self.cfg.useConsecrations and spellKnown.consecrations and not GMR.IsMoving()
+        and GMR.GetNumEnemies("player", 10) >= self.cfg.useConsecrationsMinEnemies
         and GMR.IsCastable(spells.consecrations, "player")
     then
         self.dbgPrint("should use consecrations")
@@ -981,6 +1011,92 @@ function Rotation:buff(unit)
         if not hasBlessingOfKings and GMR.IsCastable(spells.blessingOfKings, unit) then
             self.dbgPrint("should buff '" .. unit .. "' with blessing of kings as additional buff")
             GMR.Cast(spells.blessingOfKings, unit)
+            return true
+        end
+    end
+
+    return false
+end
+
+---@return boolean did cast something
+function Rotation:executeHeal()
+    if not self.cfg.healModEnabled then
+        return false
+    end
+
+    if not UnitInRaid("player") and not UnitInParty("player") then
+        return false
+    end
+
+    if self:heal("player") then
+        return true
+    end
+
+    if UnitHealth("focus") > 0 then
+        if self:heal("focus") then
+            return true
+        end
+    end
+
+    if GMR.GetMana("player") < 20 then
+        return false
+    end
+
+    if UnitInRaid("player") then
+        for raidIndex = 1, 40 do
+            local unit = "raid" .. tostring(raidIndex)
+            if self:heal(unit) then
+                return true
+            end
+        end
+    elseif UnitInParty("player") then
+        for partyIndex = 1, 4 do
+            local unit = "party" .. tostring(partyIndex)
+            if self:heal(unit) then
+                return true
+            end
+        end
+    end
+
+    return false
+end
+
+---@param unit string|userdata
+---@return boolean
+function Rotation:heal(unit)
+    if GMR.GetDistance("player", unit, ">", 40) then
+        return false
+    end
+    if not GMR.IsAlive(unit) then
+        return false
+    end
+
+    local missingHealth = GMR.UnitHealthMax(unit) - GMR.UnitHealth(unit)
+    if GMR.IsMoving() then
+        if missingHealth >= self.cfg.healModHolyShockHealAmount and GMR.IsCastable(spells.holyShock, unit) then
+            self.dbgPrint("should cast holy shock on '" .. unit .. "' to heal while moving")
+            GMR.Cast(spells.holyShock, unit)
+            return true
+        elseif missingHealth >= (self.cfg.healModFlashOfLightHealAmount * 1.5) -- crit 100%
+            and GMR.HasBuff("player", buffs.infusionOfLight)
+            and GMR.IsCastable(spells.flashOfLight, unit)
+        then
+            self.dbgPrint("should cast flash of light on " .. unit .. " to heal with 'infusion of light' buff while moving")
+            GMR.Cast(spells.flashOfLight, unit)
+            return true
+        end
+    else
+        if missingHealth >= self.cfg.healModHolyLightHealAmount and GMR.IsCastable(spells.holyLight, unit) then
+            self.dbgPrint("should cast holy light on " .. unit .. " while standing")
+            GMR.Cast(spells.holyLight, unit)
+            return true
+        elseif missingHealth >= self.cfg.healModHolyShockHealAmount and GMR.IsCastable(spells.holyShock, unit) then
+            self.dbgPrint("should cast holy shock on " .. unit .. " while standing")
+            GMR.Cast(spells.holyShock, unit)
+            return true
+        elseif missingHealth >= self.cfg.healModFlashOfLightHealAmount and GMR.IsCastable(spells.flashOfLight, unit) then
+            self.dbgPrint("should cast flash of light on " .. unit .. " while standing")
+            GMR.Cast(spells.flashOfLight, unit)
             return true
         end
     end

@@ -9,6 +9,7 @@
 - smart group cleanse (BG, dungeon tested)
 - smart group buff (BG, dungeon tested)
 - online update
+- (experimental) Healer logic
 
 ## Installation
 - turn off spells in Spells tab:
@@ -31,7 +32,7 @@
 ## Backlog
 - ~~level up my paladin to lvl 70 and check all skills~~
 - ~~make a top retri DPS~~ (DM if it not)
-- some healer stuff?
+- ~~some healer stuff?~~
   - ~~smart group clense~~
   - ~~smrt group buff~~
 - some tank stuff?

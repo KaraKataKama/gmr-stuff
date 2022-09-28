@@ -1495,8 +1495,12 @@ function GMR.UnitHasPaladinBuff(unit) end
 ---@param unit string|userdata
 ---@return boolean
 function GMR.UnitHasScrollBuff(unit) end
-function GMR.UnitHealth() end
-function GMR.UnitHealthMax() end
+---@param unit string|userdata
+---@return number
+function GMR.UnitHealth(unit) end
+---@param unit string|userdata
+---@return number
+function GMR.UnitHealthMax(unit) end
 function GMR.UnitInParty() end
 function GMR.UnitInRaid() end
 function GMR.UnitInteract() end

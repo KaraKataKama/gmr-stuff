@@ -28,20 +28,24 @@ local Config = {
     onlineLoad = true,
     consumeArtOfWarFlashLightMinHp = 80,
     consumeArtOfWarFlashLightIfAuraDepletedSoon = true,
+
+    useConsecrations = true,
     useConsecrationsMinEnemies = 2,
     useDivineStormMinEnemies = 2,
 
     groupCleanseModEnabled = false,
-    useJudgmentType = 1, -- 1 - Judgement of Light, 2 - Judgement of Wisdom, 3 - Judgement of Justice
+    useJudgmentType = 1, -- 1:Judgement of Light; 2:Judgement of Wisdom; 3:Judgement of Justice;
+    useJudgmentTryToCleave = true,
+    useJudgmentForDebuffOnly = false,
     useJudgmentCooldown = 10,
 
     useHandOfReckoningToMakeDamage = true,
     useHandOfReckoningInInstance = false,
 
     defaultAuraToUse = 2, -- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Shadow Resistance Aura; 5:Frost Resistance Aura; 6:Fire Resistance Aura
-    defaultAuraChangeIfAlreadyExist = {1,3,5}, -- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Shadow Resistance Aura; 5:Frost Resistance Aura; 6:Fire Resistance Aura
-    defaultBlessingToUse = 1, -- 1:Blessing of Might; 2:Blessing of Kings
-    defaultSealToUse = 5, -- 1:Seal of Righteousness; 2:Seal of Justice; 3:Seal of Light; 4:Seal of Wisdom; 5:Seal of Command; 6:Seal of Corruption;
+    defaultAuraChangeIfAlreadyExist = {1,3}, -- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Shadow Resistance Aura; 5:Frost Resistance Aura; 6:Fire Resistance Aura
+    defaultBlessingToUse = 1, -- 1:Blessing of Might; 2:Blessing of Kings; 3:Blessing of Wisdom
+    defaultSealToUse = 1, -- 1:Seal of Righteousness; 2:Seal of Justice; 3:Seal of Light; 4:Seal of Wisdom; 5:Seal of Command; 6:Seal of Corruption;
     defaultSealDoNotSwitchList = {6}, -- 1:Seal of Righteousness; 2:Seal of Justice; 3:Seal of Light; 4:Seal of Wisdom; 5:Seal of Command; 6:Seal of Corruption;
 
     useCrusaderAuraWhileMounted = true,
@@ -54,6 +58,11 @@ local Config = {
 
     useDivineProtectionMinHP = 70,
     useHandOfProtectionMinHP = 40,
+
+    healModEnabled = false,
+    healModHolyLightHealAmount = 3200,
+    healModFlashOfLightHealAmount = 820,
+    healModHolyShockHealAmount = 1800,
 }
 
 AMST_SHARE["CR>P/R.CFG"] = Config

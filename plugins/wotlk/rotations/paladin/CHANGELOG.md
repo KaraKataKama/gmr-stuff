@@ -1,4 +1,9 @@
 # CHANGELOG:
+## v1.6.0
+- added experimental heal feature
+- added tumbler for consecrations spell
+- added new behaviours for judgment usage
+- added usage of Blessing of Wisdom
 ## v1.5.0
 - fixed buff and cleans mods in 5-party
 - optimized head of reckoning usage
