@@ -30,6 +30,12 @@ local Config = {
     ---Use online loading feature to get last updates
     onlineLoad = true,
 
+    useTrinket1 = false,
+    useTrinket1Type = 1, -- 1:self-buff, 2:target-harmful, 3:aoe-harmful
+
+    useTrinket2 = false,
+    useTrinket2Type = 1, -- 1:self-buff, 2:target-harmful, 3:aoe-harmful
+
     ---@type AmstLibCombatRotation
     cr = nil
 }
@@ -85,17 +91,21 @@ local Rotation = {
     state = nil,
     ---@type AmstLibCombatRotation
     cr = nil,
+    ---@type AmstLibTrinketer
+    trinketer = nil,
 }
 ---@param cfg RogueConfig
 ---@param state RogueState
 ---@param cr AmstLibCombatRotation
+---@param trinketer AmstLibTrinketer
 ---@return RogueRotation
-function Rotation:new(cfg, state, cr)
+function Rotation:new(cfg, state, cr, trinketer)
     ---@type RogueRotation
     local o = {
         cfg = cfg,
         state = state,
         cr = cr,
+        trinketer = trinketer,
     }
     setmetatable(o, self)
     self.__index = self
@@ -205,6 +215,10 @@ function Rotation:execute()
         end
     end
 
+    if self.trinketer:useTrinkets() then
+        return
+    end
+
     --for i = 1, #GMR.Tables.Attackables do
     --    local attackable = GMR.Tables.Attackables[i][1]
     --    if GMR.ObjectExists(attackable) and GMR.GetDistance("player", attackable, "<", 30) then
@@ -307,7 +321,10 @@ do
                 local state = State:new()
                 state:determine(cfg)
 
-                local rotation = Rotation:new(cfg, state, cr)
+                local trinketer = AmstLibTrinketer:new(cr)
+                trinketer:initialize(amstlib.CONST.SPELL.doorOfShadows)
+
+                local rotation = Rotation:new(cfg, state, cr, trinketer)
                 return function()
                     rotation:execute()
                 end

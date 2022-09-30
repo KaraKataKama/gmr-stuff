@@ -16,17 +16,23 @@
 --along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 local ID = "CR>R/O"
-local LIB_LINK = ""
-local ROTATION_LINK = ""
+local LIB_LINK = "https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/plugins/wotlk%2Bclassic%2Bretail/custom/00_amstlib.lua"
+local ROTATION_LINK = "https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/plugins/retail/rotations/rogue/v1/02_amstaffix_rogue_outlaw_rotation.lua"
 ---@type RogueConfig
 local Config = {
     ---Toggle debug mode. Turn on, if you encounter some issues and want to deal with it, or record a video and send
     ---to author.
-    debug = true,
+    debug = false,
     ---Use standard CombatRotation pluggable function. Change only if you know what you are doing.
     useCombatRotationLauncher = true,
     ---Use online loading feature to get last updates
-    onlineLoad = false,
+    onlineLoad = true,
+
+    useTrinket1 = false,
+    useTrinket1Type = 1, -- 1:self-buff, 2:target-harmful, 3:aoe-harmful
+
+    useTrinket2 = false,
+    useTrinket2Type = 1, -- 1:self-buff, 2:target-harmful, 3:aoe-harmful
 }
 
 do
