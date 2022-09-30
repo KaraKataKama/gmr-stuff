@@ -27,6 +27,12 @@ local Config = {
     useCombatRotationLauncher = true,
     ---Use online loading feature to get last updates
     onlineLoad = true,
+
+    useTrinket1 = false,
+    useTrinket1Type = 1, -- 1:self-buff, 2:target-harmful, 3:aoe-harmful
+
+    useTrinket2 = false,
+    useTrinket2Type = 1, -- 1:self-buff, 2:target-harmful, 3:aoe-harmful
 }
 
 do
@@ -38,7 +44,7 @@ do
             Callback = function(content)
                 RunScript(content)
                 if not amstlib then
-                    GMR.Print(msgPrefix.."AmsTaFFix' Lib do not initialized properly")
+                    GMR.Print(msgPrefix .. "AmsTaFFix' Lib do not initialized properly")
                     return
                 end
 
@@ -48,9 +54,11 @@ do
             end
         })
     else
-        GMR.Print(msgPrefix.."Offline loading of rotation initiated")
+        GMR.Print(msgPrefix .. "Offline loading of rotation initiated")
         local cr = amstlib:getCombatRotation(ID)
         cr:prepare(Config)
-        cr:load(ROTATION_LINK)
+        if Config.onlineLoad then
+            cr:load(ROTATION_LINK)
+        end
     end
 end

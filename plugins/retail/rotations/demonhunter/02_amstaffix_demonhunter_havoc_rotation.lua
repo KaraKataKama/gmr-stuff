@@ -28,6 +28,12 @@ local Config = {
     ---Use online loading feature to get last updates
     onlineLoad = true,
 
+    useTrinket1 = false,
+    useTrinket1Type = 1, -- 1:self-buff, 2:target-harmful, 3:aoe-harmful
+
+    useTrinket2 = false,
+    useTrinket2Type = 1, -- 1:self-buff, 2:target-harmful, 3:aoe-harmful
+
     ---@type AmstLibCombatRotation
     cr = nil
 }
@@ -83,17 +89,21 @@ local Rotation = {
     state = nil,
     ---@type AmstLibCombatRotation
     cr = nil,
+    ---@type AmstLibTrinketer
+    trinketer = nil
 }
 ---@param cfg PaladinConfig
 ---@param state PaladinState
 ---@param cr AmstLibCombatRotation
+---@param trinketer AmstLibTrinketer
 ---@return DemonHunterRotation
-function Rotation:new(cfg, state, cr)
+function Rotation:new(cfg, state, cr, trinketer)
     ---@type DemonHunterRotation
     local o = {
         cfg = cfg,
         state = state,
         cr = cr,
+        trinketer = trinketer,
     }
     setmetatable(o, self)
     self.__index = self
@@ -130,7 +140,7 @@ function Rotation:execute()
     local useDemonBiteMaxPower = powerMax - demonsBitePowerGen
     local chaosStrikePowerCost = 40
     local shouldCastAdditionalSpells = true
-    if GMR.HasBuff("player", amstlib.CONST.BUFF.metamorphosis) and amstlib.Util.GetBuffExpiration("player", amstlib.CONST.BUFF.metamorphosis) < 8 then
+    if GMR.HasBuff("player", amstlib.CONST.BUFF.metamorphosis) and GMR.GetBuffExpiration("player", amstlib.CONST.BUFF.metamorphosis) < 8 then
         shouldCastAdditionalSpells = false
     end
 
@@ -183,26 +193,8 @@ function Rotation:execute()
         return
     end
 
-    local trinkets = {
-        { slotId = amstlib.CONST.INVENTORY.SLOT_ID.TRINKET_1, isAoe = true, },
-        { slotId = amstlib.CONST.INVENTORY.SLOT_ID.TRINKET_2, isAoe = false, },
-    }
-    for index, trinket in ipairs(trinkets) do
-        local itemId = GetInventoryItemID("player", trinket.slotId)
-        local cooldownStart, duration = GetItemCooldown(itemId)
-        if cooldownStart == 0 and GMR.IsCastable(spellToCheckGCD, "player") then
-            if trinket.isAoe then
-                if not GMR.IsMoving() and GMR.GetNumEnemies("player", 15) >= 1 then
-                    self.cr:printDbg("should use trinket #" .. tostring(index) .. " as AOE")
-                    GMR.RunMacroText("/use [@player] " .. tostring(trinket.slotId))
-                    return
-                end
-            else
-                self.cr:printDbg("should use trinket #" .. tostring(index) .. " as usual use")
-                GMR.Use(itemId)
-                return
-            end
-        end
+    if self.trinketer:useTrinkets() then
+        return
     end
 
     if isTargetAttackable and power <= useDemonBiteMaxPower and GMR.IsCastable(amstlib.CONST.SPELL.demonsBite, "target") then
@@ -257,7 +249,10 @@ do
                 local state = State:new()
                 state:determine(cfg)
 
-                local rotation = Rotation:new(cfg, state, cr)
+                local trinketer = AmstLibTrinketer:new(cr)
+                trinketer:initialize(amstlib.CONST.SPELL.doorOfShadows)
+
+                local rotation = Rotation:new(cfg, state, cr, trinketer)
                 return function()
                     rotation:execute()
                 end
