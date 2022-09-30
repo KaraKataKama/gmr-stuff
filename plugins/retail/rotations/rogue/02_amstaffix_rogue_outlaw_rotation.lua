@@ -18,6 +18,8 @@
 local ID = "CR>R/O"
 local VERSION = "v1.0.0"
 
+local IsCastable = amstlib.createIsCastableFunc(amstlib.CONST.SPELL.kick)
+
 ---@class RogueConfig
 local Config = {
     ---Toggle debug mode. Turn on, if you encounter some issues and want to deal with it, or record a video and send
@@ -117,14 +119,6 @@ function Rotation:execute()
         return
     end
 
-    local spellToCheckMeleeRange = amstlib.CONST.SPELL.kick
-    local isMeleeSpellCastable = function(spell, unit)
-        return GMR.IsSpellInRange(spellToCheckMeleeRange, unit)
-            and GMR.IsSpellUsable(spell)
-            and GetSpellCooldown(spell) == 0
-            and GMR.InLoS("player", unit)
-    end
-    local meleeRangeMax = 10
     local power = GMR.UnitPower("player")
     local powerMax = GMR.UnitPowerMax("player")
     local comboPoints = GMR.UnitPower("player", 4)
@@ -233,7 +227,7 @@ function Rotation:execute()
 
     if not shouldUseFinisher and amstlib.CONST.SPELL_KNOWN.echoingReprimand
         and comboPoints + echoingReprimandCPGen <= comboPointMax
-        and isMeleeSpellCastable(amstlib.CONST.SPELL.echoingReprimand, "target")
+        and IsCastable(amstlib.CONST.SPELL.echoingReprimand, "target")
     then
         self.cr:printDbg("should cast echoing reprimand to generate CP")
         GMR.Cast(amstlib.CONST.SPELL.echoingReprimand, "target")
@@ -251,7 +245,7 @@ function Rotation:execute()
     end
 
     if not shouldUseFinisher and comboPointMax - comboPoints >= 2 and amstlib.CONST.SPELL_KNOWN.sinisterStrike
-        and isMeleeSpellCastable(amstlib.CONST.SPELL.sinisterStrike, "target")
+        and IsCastable(amstlib.CONST.SPELL.sinisterStrike, "target")
     then
         self.cr:printDbg("should cast sinister strike to generate CP")
         GMR.Cast(amstlib.CONST.SPELL.sinisterStrike, "target")
@@ -276,7 +270,7 @@ function Rotation:execute()
     end
 
     if amstlib.CONST.SPELL_KNOWN.dispatch and shouldUseFinisher
-        and isMeleeSpellCastable(amstlib.CONST.SPELL.dispatch, "target")
+        and IsCastable(amstlib.CONST.SPELL.dispatch, "target")
     then
         self.cr:printDbg("should cast dispatch to consume CP")
         GMR.Cast(amstlib.CONST.SPELL.dispatch, "target")
