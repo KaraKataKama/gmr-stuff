@@ -96,7 +96,7 @@ AMST_SHARE["CR/DK/B.CFG"] = Config
 if Config.onlineLoad then
     local httpRequester = _G.SendHttpRequestTinkrFix or GMR.SendHttpRequest
     httpRequester({
-        Url = "https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/plugins/wotlk/rotations/deathknight/v2/02_amstaffix_deathknight_blood_rotation.lua",
+        Url = "https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/plugins/wotlk/rotations/deathknight/v2/02_amstaffix_deathknight_rotation.lua",
         Method = "Get",
         Callback = function(content)
             GMR.RunString(content)
