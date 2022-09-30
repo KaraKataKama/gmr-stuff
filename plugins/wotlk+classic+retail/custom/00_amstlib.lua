@@ -63,6 +63,18 @@ amstlib.CONST.SPELL = {
     sinfulBrand = GetSpellInfo(317009),
     doorOfShadows = GetSpellInfo(300728),
     frostBolt = GetSpellInfo(8408),
+    rollTheBones = GetSpellInfo(315508),
+    sinisterStrike = GetSpellInfo(193315),
+    betweenTheEyes = GetSpellInfo(315341),
+    pistolShot = GetSpellInfo(185763),
+    dispatch = GetSpellInfo(2098),
+    sliceAndDice = GetSpellInfo(315496),
+    bladeRush = GetSpellInfo(271877),
+    adrenalineRush = GetSpellInfo(13750),
+    bladeFlurry = GetSpellInfo(13877),
+    echoingReprimand = GetSpellInfo(323547),
+    crimsonVial = GetSpellInfo(185311),
+    kick = GetSpellInfo(1766),
 }
 amstlib.CONST.SPELL_KNOWN = {
     exorcism = GMR.IsSpellKnown(amstlib.CONST.SPELL.exorcism),
@@ -106,6 +118,18 @@ amstlib.CONST.SPELL_KNOWN = {
     sinfulBrand = GMR.IsSpellKnown(amstlib.CONST.SPELL.sinfulBrand),
     doorOfShadows = GMR.IsSpellKnown(amstlib.CONST.SPELL.doorOfShadows),
     frostBolt = GMR.IsSpellKnown(amstlib.CONST.SPELL.frostBolt),
+    rollTheBones = GMR.IsSpellKnown(amstlib.CONST.SPELL.rollTheBones),
+    sinisterStrike = GMR.IsSpellKnown(amstlib.CONST.SPELL.sinisterStrike),
+    betweenTheEyes = GMR.IsSpellKnown(amstlib.CONST.SPELL.betweenTheEyes),
+    pistolShot = GMR.IsSpellKnown(amstlib.CONST.SPELL.pistolShot),
+    dispatch = GMR.IsSpellKnown(amstlib.CONST.SPELL.dispatch),
+    sliceAndDice = GMR.IsSpellKnown(amstlib.CONST.SPELL.sliceAndDice),
+    bladeRush = GMR.IsSpellKnown(amstlib.CONST.SPELL.bladeRush),
+    adrenalineRush = GMR.IsSpellKnown(amstlib.CONST.SPELL.adrenalineRush),
+    bladeFlurry = GMR.IsSpellKnown(amstlib.CONST.SPELL.bladeFlurry),
+    echoingReprimand = GMR.IsSpellKnown(amstlib.CONST.SPELL.echoingReprimand),
+    crimsonVial = GMR.IsSpellKnown(amstlib.CONST.SPELL.crimsonVial),
+    kick = GMR.IsSpellKnown(amstlib.CONST.SPELL.kick),
 }
 amstlib.CONST.BUFF = {
     theArtOfWar = GetSpellInfo(59578),
@@ -126,6 +150,15 @@ amstlib.CONST.BUFF = {
     shadowResistanceAura = GetSpellInfo(27151),
     frostResistanceAura = GetSpellInfo(19898),
     metamorphosis = GetSpellInfo(162264),
+    grandMelee = GetSpellInfo(193358),
+    broadside = GetSpellInfo(193356),
+    ruthlessPrecision = GetSpellInfo(193357),
+    buriedTreasure = GetSpellInfo(199600),
+    skullAndCrossbones = GetSpellInfo(199603),
+    trueBearing = GetSpellInfo(193359),
+    opportunity = GetSpellInfo(195627),
+    sliceAndDice = GetSpellInfo(315496),
+    echoingReprimand = GetSpellInfo(323560),
 }
 amstlib.CONST.DEBUFF = {
     sinfulBrand = GetSpellInfo(317009),
@@ -155,27 +188,30 @@ amstlib.CONST.CLASS = {
 ---@class AmstLibCombatRotation
 AmstLibCombatRotation = {}
 AmstLibCombatRotation.id = ""
-AmstLibCombatRotation.state = {
-    config = {
-        onlineLoad = true,
-        debug = false,
-        ---@type boolean
-        useCombatRotationLauncher = true,
-    },
+---@type boolean
+AmstLibCombatRotation.isPrepared = false
+---@type boolean
+AmstLibCombatRotation.isInitialized = false
+AmstLibCombatRotation.version = ""
+AmstLibCombatRotation.msgPrefix = "[CR]"
+AmstLibCombatRotation.previousDbgMessagePerSlot = {}
+AmstLibCombatRotation.config = {
+    onlineLoad = true,
+    debug = false,
     ---@type boolean
-    isPrepared = false,
-    ---@type boolean
-    isInitialized = false,
-    version = "",
-    msgPrefix = "[CR]",
+    useCombatRotationLauncher = true,
 }
 
 ---@param id string
 ---@return AmstLibCombatRotation
 function AmstLibCombatRotation:new(id)
-    local o = { id = id, state = { msgPrefix = "[" .. id .. "]" } }
+    ---@type AmstLibCombatRotation
+    local o = { id = id }
     setmetatable(o, self)
     self.__index = self
+
+    o.msgPrefix = "[" .. id .. "]"
+
     return o
 end
 
@@ -198,70 +234,67 @@ function AmstLibCombatRotation:validateConfig(config)
         end
     end
 end
----@param id string
 ---@param config table
 ---@return boolean, string result and details
 function AmstLibCombatRotation:prepare(config)
     self:validateConfig(config)
 
-    self.state.config = config
-    self.state.isPrepared = true
-end
----@return boolean
-function AmstLibCombatRotation:isPrepared()
-    return self.state.isPrepared
-end
-
-function AmstLibCombatRotation:isInitialized()
-    return self.state.isInitialized
+    self.config = config
+    self.isPrepared = true
 end
 
 ---@param msg string
 ---@return void
 function AmstLibCombatRotation:print(msg)
-    GMR.Print(self.state.msgPrefix .. " " .. msg)
+    GMR.Print(self.msgPrefix .. " " .. msg)
 end
 
 ---@param msg string
+---@param slot number
 ---@return void
-function AmstLibCombatRotation:printDbg(msg)
-    if not self.state.config.debug then
+function AmstLibCombatRotation:printDbg(msg, slot)
+    slot = slot or 1
+    if not self.config.debug then
         return
     end
 
-    GMR.Print(self.state.msgPrefix .. "[DEBUG] " .. tostring(msg))
+    if msg == self.previousDbgMessagePerSlot[slot] then
+        return
+    end
+
+    GMR.Print(self.msgPrefix .. "[DEBUG] " .. tostring(msg))
+    self.previousDbgMessagePerSlot[slot] = msg
 end
 
 ---@param msg string
 ---@return void
 function AmstLibCombatRotation:printError(msg)
-    GMR.Print(self.state.msgPrefix .. "[ERROR] " .. tostring(msg))
+    GMR.Print(self.msgPrefix .. "[ERROR] " .. tostring(msg))
 end
 
 function AmstLibCombatRotation:getConfig()
-    if not self:isPrepared() then
+    if not self.isPrepared then
         error("Combat rotation is not prepared")
     end
 
-    return self.state.config
+    return self.config
 end
 
 ---@return boolean, string result and details
 function AmstLibCombatRotation:load(link)
-    if not self:isPrepared() then
+    if not self.isPrepared then
         error("rotation not prepared, should call prepare() func first")
         return
     end
 
-    if self.state.config.onlineLoad then
+    if self.config.onlineLoad then
         GMR.SendHttpRequest({
             Url = link,
             Method = "Get",
             Callback = function(content)
                 RunScript(content)
-                if not self:isInitialized() then
+                if not self.isInitialized then
                     self:printError("Rotation have not loaded properly!")
-                    self:printError("Content is: " .. content)
                 end
             end
         })
@@ -278,17 +311,21 @@ function AmstLibCombatRotation:initialize(version, checkFunc, rotationCreateFunc
     if not version then
         error("version is empty")
     end
-    self.state.version = version
-    self.state.msgPrefix = "[" .. self.id .. "|" .. version .. "]"
+    if not self.isPrepared then
+        error("rotation is not prepared")
+    end
+    self.version = version
+    self.msgPrefix = "[" .. self.id .. "|" .. version .. "]"
 
     if not checkFunc() then
         return false
     end
 
-    if self.state.isInitialized then
-        self:printError("this combat rotation already initialized")
+    if self.isInitialized then
+        self:print("this combat rotation already initialized, nothing new will happen")
+        return
     end
-    self.state.isInitialized = true
+    self.isInitialized = true
 
     self:print("Rotation would be initialized")
     local rotation = rotationCreateFunc()
@@ -299,7 +336,7 @@ function AmstLibCombatRotation:initialize(version, checkFunc, rotationCreateFunc
         end
     end
 
-    if self.state.config.useCombatRotationLauncher then
+    if self.config.useCombatRotationLauncher then
         local resultFunction
         if GMR.CustomCombatConditions == nil then
             resultFunction = executeRotationFunc
@@ -342,6 +379,25 @@ function AmstLibCombatRotation:initialize(version, checkFunc, rotationCreateFunc
 
     self:print("Rotation fully initialized and turned on.")
     return
+end
+
+---Check is spell castable. I have to add this method, because original GMR.IsCastable and even WoW's API methods not
+---works properly with some melee spells (Retail Rogue, Retail Demon Hunter) and can't determine properly valid
+---destination (it think valid destination is shorter).
+---
+---@param spellToCheckRange string spell, that would be used to determine real destination instead of spell with issue
+---@return fun(spell:string, unit:string):boolean
+function amstlib.createIsCastableFunc(spellToCheckRange)
+    return function(spell, unit)
+        local isSpellInRange = GMR.IsSpellInRange(spell, unit)
+        if isSpellInRange == nil then
+            GMR.IsSpellInRange(spellToCheckRange, unit)
+        end
+        return isSpellInRange
+            and GMR.IsSpellUsable(spell)
+            and GetSpellCooldown(spell) == 0
+            and GMR.InLoS("player", unit)
+    end
 end
 
 ---@class AmstLibInterrupter
@@ -429,4 +485,159 @@ function amstlib.Util.canInterruptSafely(unit)
     return true
 end
 
+function amstlib.Util.printTable(tbl)
+    for k, v in pairs(tbl) do
+        GMR.Print("[" .. tostring(k) .. "] => '" .. tostring(v) .. "'")
+    end
+end
+
 GMR.RunEncryptedScript("Dwmp8SO47wDMnLB/XJotsZJa5KoW8faR2zg83EqLjzRVtrkO/DLLEcFo6KPvGFA+njoS/OpjAHEZl0quNwCeSoGYpfZo/peHfGokp5sFO+lkbWYyDLiT+wNbmcsvnVT04cCB0gjbmb27mXjaKZti7fXg/zCc2p7pKEJyyb/0jyMJIBDfBgwfCYZYhNHlJcQmTAYlGXaH/L1bKKiWVP5vvt8M2ih6LcMfvwI4FL0UlDRHGPgrxxIHcd08YpniWZtYp90BmtWNfm7Dan0OtU7+CIvKoOf8KpLibhboN4j046aBG6TV7ZI99aV1PrYN4ufeCuu0p+QhL/qtE6Ww9LYScpM9XF0uulhbztSylZY+RbGQWt8cpebvwZctFnuN6iB4df1tW4AfBgg+J2F3tgt1j7rlrMNPZeyzDkeAmSaK4cgTxN2SExNmEgXqBdTbeNJPgbSN9sbZrPMJXMSOAZ1i001kZ/LQP82aKspTdWWSz2WrmcuPw18jfUxHGda9qR46KwPVGeKFZ3pc/hsMcvPCmWyM6o9m8EhOwKCtKlUmrKWXWbCQullnI8zeBfNfTVCsQUC6QhQ+xin6mRHyinxMT7JzNEX8RUM49SvgYr5ZvMsNUrTcHdrl2u/5ihNu8Y0hyLqo5uP5OpcZrDPJylIKJ1vsKTnk9Uf5GMOrHlpNMd6G3guK3RBQBGoJISdpDU/jchyhOXNg/iaNKpiHc4TO/Ggm0Wlf325U5u04M5UrfPm80y08Szaz40S67QCQuHDBHdlRDWff6xwXwg6LMNEkkS4G966iKhbMWmx4mw6sc9YRNcdSlHixe7unJaFAolif75tuH6J8h5gCpVR/zJrUqZ6mYilfe3OkUCHAWVmlFlnzCdmyLUtowkWm5LJ9Y+JmpduiuslReq9+10muWeleV0hjLZbKkv6dLM0SIieSruuqGcAJ+ns6yJrxiYhuugU5NYR1O9vnsjrA5Dk/rYUgAa+He0ccN/xaCFnXelQRZqJuZxtnZqsGMzJAjTSX0mSgE5nMdZBXiDOtTQ9GCTC+h1QWHRSmEsuLgmfZSJnpj2C1uc3/wppZGnoUpuX873P9xOkmAgoQhg/h4IxzluCZVBq8DeHJrDAPNlm/UBPLKYFA9vSStNRYn97ero0oAgVPJdrHQ2A31s1pl85E04IfMYEUBvKscNYPrczsGAWyab2CIYOgjGWKwbbBNVgCmugMxEjL4E3TtsfOCv1LUj6pia2IibvayS9AP2YS+M7qbLv6euSNG0pGTUw3shT+bSYTg09UCss7eTL+aQwkiIigbj5Qc6AljZ2OdCbZvL3mdqQ0YxKl+UMXHp0GByN4vIqnji6mtwDdAnLcq1UjhbfQCQR5fo8AoxLeBc0Uej7zSYQcoGkAcQCput33y2YHcIAhhZNBs9tpHTlE0vJbE2kp8xui94ahYWRhHKcUguHa0xz66jipXl28Ey/Kjj+fxFxJPcYU2O8JtL49Vcy+00gplH787pj/PKfZlLmrc1hw+b6RQj5dPnMmRa2MukXMdy+jajOXDr8BP+zmUK5U+hNxHumiECkAHl1YI9lcRQxawag=")
+
+-- ---------------- --
+-- --- TRINKETS --- --
+-- ---------------- --
+
+amstlib.CONST.TRINKET_TYPE = {
+    SELF_BUFF = 1,
+    TARGET_HARMFUL = 2,
+    AOE_HARMFUL = 3,
+}
+
+---@class AmstLibTrinket
+AmstLibTrinket = {}
+---@type number
+AmstLibTrinket.index = 0
+---@type number
+AmstLibTrinket.inventoryId = 0
+---@type number
+AmstLibTrinket.type = 0
+
+---@return AmstLibTrinket
+function AmstLibTrinket:new(index, type)
+    local inventoryId = 0
+    if index == 1 then
+        inventoryId = amstlib.CONST.INVENTORY.SLOT_ID.TRINKET_1
+    elseif index == 2 then
+        inventoryId = amstlib.CONST.INVENTORY.SLOT_ID.TRINKET_2
+    else
+        error("invalid trinket index '" .. tostring(type) .. "'")
+    end
+
+    if type ~= amstlib.CONST.TRINKET_TYPE.SELF_BUFF and type ~= amstlib.CONST.TRINKET_TYPE.TARGET_HARMFUL
+        and type ~= amstlib.CONST.TRINKET_TYPE.AOE_HARMFUL
+    then
+        error("invalid type '" .. tostring(type) .. "'")
+    end
+
+    local o = {
+        index = index,
+        inventoryId = inventoryId,
+        type = type,
+    }
+    setmetatable(o, self)
+    self.__index = self
+    return o
+end
+
+---@class AmstLibTrinketer
+AmstLibTrinketer = {}
+---@type AmstLibCombatRotation
+AmstLibTrinketer.cr = nil
+---@type AmstLibTrinket[]
+AmstLibTrinketer.trinkets = {}
+---@type boolean
+AmstLibTrinketer.isInitialized = false
+AmstLibTrinketer.spellToCheckGCD = ""
+
+---@param cr AmstLibCombatRotation
+function AmstLibTrinketer:new(cr)
+    local o = { cr = cr }
+    setmetatable(o, self)
+    self.__index = self
+    return o
+end
+
+---@param spellToCheckGCD string
+---@return void
+function AmstLibTrinketer:initialize(spellToCheckGCD)
+    if not self.cr.isPrepared then
+        error("can't initialize trinket usage, because rotation not prepared")
+    end
+    if not spellToCheckGCD then
+        error("spell to check GCD is empty")
+    end
+
+    local fieldsToUse = { "useTrinket1", "useTrinket1Type", "useTrinket2", "useTrinket2Type" }
+    local missedFields = {}
+    for _, field in ipairs(fieldsToUse) do
+        local cfg = self.cr:getConfig()
+        self.cr:printDbg("field: " .. tostring(cfg.onlineLoad))
+        if self.cr:getConfig()[field] == nil then
+            table.insert(missedFields, field)
+        end
+    end
+
+    if #missedFields > 0 then
+        local fieldsAsStr = ""
+        for i, f in ipairs(missedFields) do
+            if i > 1 then
+                fieldsAsStr = fieldsAsStr .. ", "
+            end
+            fieldsAsStr = fieldsAsStr .. f
+        end
+        self.cr:printError("can't initialize trinket usage, because config do not have necessary fields: " .. fieldsAsStr)
+        return
+    end
+
+    self.spellToCheckGCD = spellToCheckGCD
+
+    local trinketRawData = {}
+    if self.cr:getConfig()["useTrinket1"] then
+        table.insert(trinketRawData, { 1, self.cr:getConfig()["useTrinket1Type"] })
+    end
+    if self.cr:getConfig()["useTrinket2"] then
+        table.insert(trinketRawData, { 2, self.cr:getConfig()["useTrinket2Type"] })
+    end
+    for _, trinketData in ipairs(trinketRawData) do
+        local trinket = AmstLibTrinket:new(trinketData[1], trinketData[2])
+        table.insert(self.trinkets, trinket)
+        self.cr:print("Character will use trinket with inventory id '" .. tostring(trinket.inventoryId) .. "' type '" .. tostring(trinket.type) .. "' ")
+    end
+
+    self.isInitialized = true
+end
+
+---@return boolean has been used
+function AmstLibTrinketer:useTrinkets()
+    if not self.isInitialized then
+        return false
+    end
+
+    for _, trinket in ipairs(self.trinkets) do
+        local itemId = GetInventoryItemID("player", trinket.inventoryId)
+        local cooldownStart, duration = GetItemCooldown(itemId)
+        if cooldownStart == 0 and GMR.IsCastable(self.spellToCheckGCD, "player") then
+            if trinket.type == amstlib.CONST.TRINKET_TYPE.AOE_HARMFUL then
+                if not GMR.IsMoving() and GMR.GetNumEnemies("player", 15) >= 1 then
+                    self.cr:printDbg("should use trinket #" .. tostring(trinket.index) .. " as AOE")
+                    GMR.RunMacroText("/use [@player] " .. tostring(trinket.inventoryId))
+                    return true
+                end
+            elseif trinket.type == amstlib.CONST.TRINKET_TYPE.SELF_BUFF
+                and GMR.GetDistance("player", "target", "<", 6)
+            then
+                self.cr:printDbg("should use trinket #" .. tostring(trinket.index) .. " as self-buff")
+                GMR.Use(itemId)
+                return true
+            elseif trinket.type == amstlib.CONST.TRINKET_TYPE.TARGET_HARMFUL
+                and GMR.GetDistance("player", "target", "<", 6)
+            then
+                self.cr:printDbg("should use trinket #" .. tostring(trinket.index) .. " as target harmful")
+                GMR.Use(itemId)
+                return true
+            end
+        end
+    end
+
+    return false
+end

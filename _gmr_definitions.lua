@@ -728,7 +728,9 @@ function GMR.GetSmoothPath() end
 function GMR.GetSoulstoneCast() end
 function GMR.GetSpecialization() end
 function GMR.GetSpeedDistance() end
-function GMR.GetSpellCooldown() end
+---@param spell string
+---@return number
+function GMR.GetSpellCooldown(spell) end
 ---@param spell string
 ---@return number @????
 function GMR.GetStackFilter(spell) end
@@ -1123,7 +1125,9 @@ function GMR.IsSpellInRange(spell, unit) end
 function GMR.IsSpellKnown(spell) end
 function GMR.IsSpellTrainable() end
 function GMR.IsSpellTraining() end
-function GMR.IsSpellUsable() end
+---@param spell string
+---@return boolean
+function GMR.IsSpellUsable(spell) end
 function GMR.IsStandingCentral() end
 function GMR.IsStandingDistanced() end
 function GMR.IsStealthCondition() end
@@ -1460,6 +1464,7 @@ function GMR.UnitAffectingCombat() end
 ---@param index number
 ---@param unknownArg any Maybe someone can tell about that arg
 ---@param buffOwnerUnit string|userdata owner of the buff
+---@return string, number, number, string, number, number, string, boolean, boolean, number  name, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId
 function GMR.UnitBuff(unit, index, unknownArg, buffOwnerUnit) end
 ---@param unit string|userdata
 ---@param anotherUnit string|userdata
@@ -1529,11 +1534,13 @@ function GMR.UnitMovementFlags() end
 function GMR.UnitName() end
 function GMR.UnitPlayerControlled() end
 ---@param unit string|userdata
+---@param powerType number Power type (Optional)
 ---@return number
-function GMR.UnitPower(unit) end
+function GMR.UnitPower(unit, powerType) end
 ---@param unit string|userdata
+---@param powerType number Power type (Optional)
 ---@return number
-function GMR.UnitPowerMax(unit) end
+function GMR.UnitPowerMax(unit, powerType) end
 function GMR.UnitPowerType() end
 function GMR.UnitRace() end
 function GMR.UnitReaction() end
