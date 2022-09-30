@@ -2,6 +2,7 @@
 ## v2.0.0
 - added possibility to tune this rotation into Frost spec
 - make so many changes, that i'm afraid of breaking previous version, so moved to v2
+- simple trinket usage
 ## v1.14.0
 - fixed death pact usage
 ## v1.13.0
