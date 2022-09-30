@@ -16,8 +16,8 @@
 --along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 local ID = "CR>R/O"
-local LIB_LINK = "https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/plugins/wotlk%2Bclassic%2Bretail/custom/00_amstlib.lua"
-local ROTATION_LINK = "https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/plugins/retail/rotations/demonhunter/02_amstaffix_demonhunter_havoc_rotation.lua"
+local LIB_LINK = ""
+local ROTATION_LINK = ""
 ---@type RogueConfig
 local Config = {
     ---Toggle debug mode. Turn on, if you encounter some issues and want to deal with it, or record a video and send
@@ -51,6 +51,8 @@ do
         GMR.Print(msgPrefix.."Offline loading of rotation initiated")
         local cr = amstlib:getCombatRotation(ID)
         cr:prepare(Config)
-        cr:load(ROTATION_LINK)
+        if Config.onlineLoad then
+            cr:load(ROTATION_LINK)
+        end
     end
 end
