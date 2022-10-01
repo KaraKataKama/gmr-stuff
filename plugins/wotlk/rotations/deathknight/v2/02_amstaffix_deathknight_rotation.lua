@@ -525,7 +525,7 @@ end
 local function GetDebuffExpiration(unit, debuff, byPlayer)
     local spellName, expiration
     local byPlayer = byPlayer or false
-    for i = 1, 20 do
+    for i = 1, 40 do
         if byPlayer == true then
             spellName, _, _, _, _, expiration = GMR.UnitDebuff(unit, i, nil, "player")
         else
