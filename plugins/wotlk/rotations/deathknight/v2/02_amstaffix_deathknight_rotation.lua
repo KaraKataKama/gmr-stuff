@@ -793,7 +793,9 @@ function Rotation:execute()
     for i = 1, #GMR.Tables.Attackables do
         local attackable = GMR.Tables.Attackables[i][1]
         -- gather debuff info for pestilence
-        if GMR.ObjectExists(attackable) and GMR.GetDistance("player", attackable, "<", self.state.pestilenceRadius) then
+        if GMR.ObjectExists(attackable) and GMR.UnitLevel(attackable) > 1
+            and GMR.GetDistance("player", attackable, "<", self.state.pestilenceRadius)
+        then
             local attackableBloodPlagueDuration = GetDebuffExpiration(attackable, spells.bloodPlague, true)
             local attackableFrostFeverDuration = GetDebuffExpiration(attackable, spells.frostFever, true)
             if attackableBloodPlagueDuration < 3 or attackableFrostFeverDuration < 3 then
