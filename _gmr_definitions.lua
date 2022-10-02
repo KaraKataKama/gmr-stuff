@@ -792,8 +792,9 @@ function GMR.HasColdWeatherFlying() end
 ---Check debuff on unit. Debuff from any source, it may be player, other players, npcs
 ---@param unit string|userdata
 ---@param debuff string
+---@param byPlayer boolean
 ---@return boolean
-function GMR.HasDebuff(unit, debuff) end
+function GMR.HasDebuff(unit, debuff, byPlayer) end
 function GMR.HasDebuffStacks() end
 function GMR.HasHerbalism() end
 function GMR.HasManaGem() end
