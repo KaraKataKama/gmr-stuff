@@ -1459,7 +1459,9 @@ function GMR.TurnLeftStart() end
 function GMR.TurnLeftStop() end
 function GMR.TurnRightStart() end
 function GMR.TurnRightStop() end
-function GMR.UnitAffectingCombat() end
+---@param unit string|userdata
+---@return boolean
+function GMR.UnitAffectingCombat(unit) end
 ---@param unit string|userdata
 ---@param index number
 ---@param unknownArg any Maybe someone can tell about that arg
@@ -1529,9 +1531,13 @@ function GMR.UnitIsTrivial() end
 ---@return boolean
 function GMR.UnitIsUnit(unit1, unit2) end
 function GMR.UnitIsVisible() end
-function GMR.UnitLevel() end
+---@param unit string|userdata
+---@return number
+function GMR.UnitLevel(unit) end
 function GMR.UnitMovementFlags() end
-function GMR.UnitName() end
+---@param unit string|userdata
+---@return string
+function GMR.UnitName(unit) end
 function GMR.UnitPlayerControlled() end
 ---@param unit string|userdata
 ---@param powerType number Power type (Optional)
@@ -1544,7 +1550,9 @@ function GMR.UnitPowerMax(unit, powerType) end
 function GMR.UnitPowerType() end
 function GMR.UnitRace() end
 function GMR.UnitReaction() end
-function GMR.UnitTarget() end
+---@param unit string|userdata
+---@return string|userdata
+function GMR.UnitTarget(unit) end
 function GMR.UnitThreatSituation() end
 function GMR.Unshift() end
 function GMR.Unstuck() end
