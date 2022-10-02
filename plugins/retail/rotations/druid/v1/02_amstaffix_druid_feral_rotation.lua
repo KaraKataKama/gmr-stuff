@@ -18,8 +18,6 @@
 local ID = "CR>D/F"
 local VERSION = "v1.0.0"
 
-local IsCastable = amstlib.createIsCastableFunc(amstlib.CONST.SPELL.kick)
-
 ---@class DruidFeralConfig
 local Config = {
     ---Toggle debug mode. Turn on, if you encounter some issues and want to deal with it, or record a video and send
