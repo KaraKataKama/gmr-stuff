@@ -1,7 +1,7 @@
 # Death Knight Rotation v2
 ## Installation
 - turn off all spells in Spells tab
-- download [01_amstaffix_deathknight_loader.lua](https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/plugins/wotlk/rotations/deathknight/v2/01_amstaffix_deathknight_loader.lua)
+- download [01_amstaffix_deathknight_loader.lua](https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/plugins/wotlk/rotations/deathknight/v2/01_amstaffix_deathknight_loader.lua) (and only this one, you should not download other files)
 - place downloaded file `01_amstaffix_deathknight_loader.lua` into
   - HWT: `{HWT_Dir}/addons/Wrath of the Lichking/Plugins/`
   - Tinkr: `{Tinkr_Dir}/scripts/GMR/Plugins/`
