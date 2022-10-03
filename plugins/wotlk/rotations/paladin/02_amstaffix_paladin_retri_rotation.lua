@@ -17,7 +17,7 @@
 
 AMST_SHARE = AMST_SHARE or {}
 AMST_SHARE["CR>P/R.LOADED"] = true
-local VERSION = "v1.7.0"
+local VERSION = "v1.7.1"
 local printMsgPrefix = "[CR>P/R|" .. VERSION .. "] "
 
 ---Print message with CR prefix
@@ -71,6 +71,7 @@ local spells = {
     sealOfWisdom = GetSpellInfo(20166),
     sealOfCommand = GetSpellInfo(20375),
     sealOfCorruption = GetSpellInfo(348704),
+    sealOfVengeance = GetSpellInfo(31801),
     greaterBlessingOfMight = GetSpellInfo(25916),
     greaterBlessingOfKings = GetSpellInfo(25898),
     shadowResistanceAura = GetSpellInfo(27151),
@@ -118,6 +119,7 @@ local spellKnown = {
     handOfProtection = GMR.IsSpellKnown(spells.handOfProtection),
     fireResistanceAura = GMR.IsSpellKnown(spells.fireResistanceAura),
     sealOfCorruption = GMR.IsSpellKnown(spells.sealOfCorruption),
+    sealOfVengeance = GMR.IsSpellKnown(spells.sealOfVengeance),
     holyLight = GMR.IsSpellKnown(spells.holyLight),
     flashOfLight = GMR.IsSpellKnown(spells.flashOfLight),
     holyShock = GMR.IsSpellKnown(spells.holyShock),
@@ -134,6 +136,7 @@ local buffs = {
     sealOfWisdom = GetSpellInfo(20166),
     sealOfCommand = GetSpellInfo(20375),
     sealOfCorruption = GetSpellInfo(348704),
+    sealOfVengeance = GetSpellInfo(31801),
     greaterBlessingOfMight = GetSpellInfo(25916),
     greaterBlessingOfKings = GetSpellInfo(25898),
     battleShout = GetSpellInfo(2048),
@@ -413,15 +416,24 @@ function PaladinSealSettings:new(cfgIndex, spell, spellKnown, buff)
     return o
 end
 
----@type table<number, PaladinSealSettings>
-local cfgIndexToSealSettingsMap = {
-    [1] = PaladinSealSettings:new(1, spells.sealOfRighteousness, spellKnown.sealOfRighteousness, buffs.sealOfRighteousness),
-    [2] = PaladinSealSettings:new(2, spells.sealOfJustice, spellKnown.sealOfJustice, buffs.sealOfJustice),
-    [3] = PaladinSealSettings:new(3, spells.sealOfLight, spellKnown.sealOfLight, buffs.sealOfLight),
-    [4] = PaladinSealSettings:new(4, spells.sealOfWisdom, spellKnown.sealOfWisdom, buffs.sealOfWisdom),
-    [5] = PaladinSealSettings:new(5, spells.sealOfCommand, spellKnown.sealOfCommand, buffs.sealOfCommand),
-    [6] = PaladinSealSettings:new(6, spells.sealOfCorruption, spellKnown.sealOfCorruption, buffs.sealOfCorruption),
-}
+---@return table<number,PaladinSealSettings> seal settings' config index to PaladinSealSettings
+local function compileCfgIndexToSealSettingsMap()
+    local tbl = {
+        [1] = PaladinSealSettings:new(1, spells.sealOfRighteousness, spellKnown.sealOfRighteousness, buffs.sealOfRighteousness),
+        [2] = PaladinSealSettings:new(2, spells.sealOfJustice, spellKnown.sealOfJustice, buffs.sealOfJustice),
+        [3] = PaladinSealSettings:new(3, spells.sealOfLight, spellKnown.sealOfLight, buffs.sealOfLight),
+        [4] = PaladinSealSettings:new(4, spells.sealOfWisdom, spellKnown.sealOfWisdom, buffs.sealOfWisdom),
+        [5] = PaladinSealSettings:new(5, spells.sealOfCommand, spellKnown.sealOfCommand, buffs.sealOfCommand),
+    }
+
+    if GMR.UnitFactionGroup("player") == "Alliance" then
+        tbl[6] = PaladinSealSettings:new(6, spells.sealOfVengeance, spellKnown.sealOfVengeance, buffs.sealOfVengeance)
+    else
+        tbl[6] = PaladinSealSettings:new(6, spells.sealOfCorruption, spellKnown.sealOfCorruption, buffs.sealOfCorruption)
+    end
+
+    return tbl
+end
 
 function Config:new()
     local o = {}
@@ -497,6 +509,7 @@ function State:determine(cfg)
         self.defaultBlessingBuff = buffs.blessingOfWisdom
     end
 
+    local cfgIndexToSealSettingsMap = compileCfgIndexToSealSettingsMap()
     if cfgIndexToSealSettingsMap[cfg.defaultSealToUse] and cfgIndexToSealSettingsMap[cfg.defaultSealToUse].spellKnown then
         self.defaultSeal = cfgIndexToSealSettingsMap[cfg.defaultSealToUse]
     end

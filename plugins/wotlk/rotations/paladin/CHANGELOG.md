@@ -1,4 +1,6 @@
 # CHANGELOG:
+## v1.7.1
+- fixed Seal of Corruption on alliance player issue
 ## v1.7.0
 - added usage of Shield of Righteousness
 ## v1.6.0

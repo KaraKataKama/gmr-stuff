@@ -1492,7 +1492,9 @@ function GMR.UnitCreatureType() end
 function GMR.UnitDebuff(unit, index) end
 function GMR.UnitDetailedThreatSituation() end
 function GMR.UnitExists() end
-function GMR.UnitFactionGroup() end
+---@param unit string|userdata
+---@return string "Alliance" or "Horde"
+function GMR.UnitFactionGroup(unit) end
 function GMR.UnitGUID() end
 ---@param unit string|userdata
 ---@return boolean
