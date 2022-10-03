@@ -836,6 +836,14 @@ function Rotation:execute()
         end
     end
 
+    if self.cfg.useFrostStrike and spellKnown.frostStrike and GMR.IsCastable(spells.frostStrike, "target")
+        and power > (powerMax - 25)
+    then
+        self.dbgPrint("should cast frost strike to prevent power overflow")
+        GMR.Cast(spells.frostStrike, "target")
+        return
+    end
+
     for _, trinket in ipairs(self.state.trinkets) do
         local itemId = GetInventoryItemID("player", trinket.inventoryId)
         local cooldownStart, duration = GetItemCooldown(itemId)
@@ -846,7 +854,7 @@ function Rotation:execute()
                     GMR.RunMacroText("/use [@player] " .. tostring(trinket.inventoryId))
                     return
                 end
-            elseif trinket.type == TRINKET_TYPE_SELF_BUFF  and GMR.GetDistance("player", "target", "<", 6) then
+            elseif trinket.type == TRINKET_TYPE_SELF_BUFF and GMR.GetDistance("player", "target", "<", 6) then
                 self.dbgPrint("should use trinket #" .. tostring(trinket.index) .. " as self-buff")
                 GMR.Use(itemId)
                 return
@@ -861,7 +869,7 @@ function Rotation:execute()
     if GMR.HasBuff("player", buffs.freezingFog) and spellKnown.howlingBlast
         and GMR.IsCastable(spells.howlingBlast, "target")
     then
-        self.dbgPrint("should cast howling blast to consume freezing for buff")
+        self.dbgPrint("should cast howling blast to consume freezing fog buff")
         GMR.Cast(spells.howlingBlast, "target")
         return
     end
@@ -953,16 +961,12 @@ function Rotation:execute()
         end
     end
 
-    if self.cfg.useFrostStrike and spellKnown.frostStrike and GMR.IsCastable(spells.frostStrike, "target") then
-        if power > (powerMax - 25) then
-            self.dbgPrint("should cast frost strike to consume power")
-            GMR.Cast(spells.frostStrike, "target")
-            return
-        elseif GMR.HasBuff("player", buffs.killingMachine) then
-            self.dbgPrint("should cast frost strike to consume killing machine buff")
-            GMR.Cast(spells.frostStrike, "target")
-            return
-        end
+    if self.cfg.useFrostStrike and spellKnown.frostStrike and GMR.IsCastable(spells.frostStrike, "target")
+        and GMR.HasBuff("player", buffs.killingMachine)
+    then
+        self.dbgPrint("should cast frost strike to consume killing machine buff")
+        GMR.Cast(spells.frostStrike, "target")
+        return
     end
 
     if not GMR.HasBuff("player", spells.hornOfWinter) and GMR.IsCastable(spells.hornOfWinter, "player")
