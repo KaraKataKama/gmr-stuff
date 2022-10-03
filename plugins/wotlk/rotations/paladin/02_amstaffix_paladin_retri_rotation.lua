@@ -17,7 +17,7 @@
 
 AMST_SHARE = AMST_SHARE or {}
 AMST_SHARE["CR>P/R.LOADED"] = true
-local VERSION = "v1.6.0"
+local VERSION = "v1.7.0"
 local printMsgPrefix = "[CR>P/R|" .. VERSION .. "] "
 
 ---Print message with CR prefix
@@ -81,6 +81,7 @@ local spells = {
     holyLight = GetSpellInfo(25292),
     flashOfLight = GetSpellInfo(19943),
     holyShock = GetSpellInfo(33072),
+    shieldOfRighteousness = GetSpellInfo(53600),
 }
 
 local spellKnown = {
@@ -120,6 +121,7 @@ local spellKnown = {
     holyLight = GMR.IsSpellKnown(spells.holyLight),
     flashOfLight = GMR.IsSpellKnown(spells.flashOfLight),
     holyShock = GMR.IsSpellKnown(spells.holyShock),
+    shieldOfRighteousness = GMR.IsSpellKnown(spells.shieldOfRighteousness),
 }
 
 local buffs = {
@@ -717,6 +719,7 @@ function Rotation:execute()
     if self:executeGroupCleanse() then
         return
     end
+
     if self:executeHeal() then
         return
     end
@@ -751,6 +754,12 @@ function Rotation:execute()
     if isTargetAttackable and spellKnown.crusaderStrike and GMR.IsCastable(spells.crusaderStrike, "target") then
         self.dbgPrint("should cast crusader strike")
         GMR.Cast(spells.crusaderStrike, "target")
+        return
+    end
+
+    if isTargetAttackable and spellKnown.shieldOfRighteousness and GMR.IsCastable(spells.shieldOfRighteousness, "target") then
+        self.dbgPrint("should cast shield of righteousness")
+        GMR.Cast(spells.shieldOfRighteousness, "target")
         return
     end
 

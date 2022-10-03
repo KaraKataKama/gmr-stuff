@@ -1,4 +1,6 @@
 # CHANGELOG:
+## v1.7.0
+- added usage of Shield of Righteousness
 ## v1.6.0
 - added experimental heal feature
 - added tumbler for consecrations spell
