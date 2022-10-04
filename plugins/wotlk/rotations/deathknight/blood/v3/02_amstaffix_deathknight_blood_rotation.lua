@@ -70,9 +70,9 @@ local Config = {
     useMarkOfBloodMinHP = 70,
 
     useDeathCoilOnEnemy = true,
-    useDeathCoilOnEnemyMaxEnemies = 1,
+    useDeathCoilOnEnemyMaxEnemies = 100,
 
-    useCorpseExplosion = true,
+    useCorpseExplosion = false,
     useCorpseExplosionMinEnemies = 3,
 
     useTrinket1 = false,
