@@ -2,6 +2,7 @@
 ## v3.0.0
 - separated frost and blood rotations to make them easier to maintain and configure
 - applied my lib
+- added feature to load rotation only for certain spec
 ## v2.1.0
 - added usage of empower rune weapon
 ## v2.0.1

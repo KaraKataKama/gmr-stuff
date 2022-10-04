@@ -1,30 +1,36 @@
-# Death Knight Rotation v2
+# WotLK > Plugin > Combat Rotation > Death Knight > Frost
+## Features
+- trying his best to execute proper rotation according to [this guide](https://www.wowhead.com/wotlk/guides/frost-death-knight-dps-overview-best-races-professions)
+- make devastating damage!
+- tested with [this build](https://www.wowhead.com/wotlk/talent-calc/death-knight/23050005-32005350352203012300033101351_001s8q11s9f21xv631ts841sxd51s8g)
+- online updates
+- open source
 ## Installation
+- delete previous v1/v2 versions!
 - turn off all spells in Spells tab
-- download [01_amstaffix_deathknight_loader.lua](https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/plugins/wotlk/rotations/deathknight/v2/01_amstaffix_deathknight_loader.lua) (and only this one, you should not download other files)
-- place downloaded file `01_amstaffix_deathknight_loader.lua` into
+- download [01_amstaffix_deathknight_frost_loader.lua](https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/plugins/wotlk/rotations/deathknight/frost/v3/01_amstaffix_deathknight_frost_loader.lua) (and only this one, you should not download other files this directory)
+- place downloaded file `01_amstaffix_deathknight_frost_loader.lua` into
   - HWT: `{HWT_Dir}/addons/Wrath of the Lichking/Plugins/`
   - Tinkr: `{Tinkr_Dir}/scripts/GMR/Plugins/`
-## Backlog
-- ~~Add possibility to online update of this rotation~~
-- ~~Add cast interrupts~~
-- ~~Add usage of racials (maybe in separate module?)~~
-- ~~Add usage of Death Grip on casters~~
-- ~~Add Strangulate Usage on caster out of melee range~~
-- ~~Add Death and Decay usage~~
-- ~~Add Unholy Frenzy usage~~
-- ~~Add Mark of Blood usage~~
-- ~~Add Dancing Rune Weapon usage~~
-- ~~Add Corpse Explosion spell usage~~
-- ~~Add Trinket usage~~
-- Add tank behaviour
-  - Add taunt usage
-  - ~~Add death grip usage to taunt enemies (casters?)~~
-  - Add Chains of Ice usage to slowdown not taunted enemies
 ## Tuning
-File has CFG lua table with some tune options, you can change as you like
+File has Config lua table with some tune options, you can change as you like
+## Backlog
+- make cast interrupts smarter
+- make more tests with death pact + ghoul combo
+- make proper actions to make summoned ghoul more powerful
+- find a way to use antimagic shield (or what the proper name)
+- add auto cast to ally ressurection
 ## Troubleshooting
 If you encounter problems you should:
 - turn on debug mode (just change `Config.debug` from `false` to `true`), then `/reload`.
 - record a video
 - send it to discord **AmsTaFFix#0047**
+## Donation
+I will be very grateful for a cup of coffee :)
+### Links to aggregates
+- [Coinbase](https://commerce.coinbase.com/checkout/4662ac44-ca8c-4f8f-9130-d647d0d89da0)
+- [NOWPayments](https://nowpayments.io/donation/AmsTaFFix)
+### My Wallets
+- **BTC** - bc1ql730vv096l5se535hllsst6367d3j27n5e0a7x
+- **LTC** - ltc1qgt8asz8wn5t8erjqdm4zhsde5h4vrzwmz648zx
+- **USDT TRC20** - TN9BKkVK1Nv7g67rSCNQLyf4uQZyEwZUcE
