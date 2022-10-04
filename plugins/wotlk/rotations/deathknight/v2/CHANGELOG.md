@@ -1,4 +1,8 @@
 # CHANGELOG:
+## v2.1.0
+- added usage of empower rune weapon
+## v2.0.1
+- changed way of debuffs calculates
 ## v2.0.0
 - added possibility to tune this rotation into Frost spec
 - make so many changes, that i'm afraid of breaking previous version, so moved to v2

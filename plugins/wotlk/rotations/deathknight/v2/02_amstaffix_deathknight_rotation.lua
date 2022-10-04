@@ -16,7 +16,7 @@
 --along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 AMST_SHARE = AMST_SHARE or {}
-local VERSION = "v2.0.0"
+local VERSION = "v2.1.0"
 local printMsgPrefix = "[CR>DK/B|" .. VERSION .. "] "
 ---Print message with CR prefix
 ---@param msg string
@@ -65,6 +65,7 @@ local spells = {
     unbreakableArmor = GetSpellInfo(51271),
     deathGate = GetSpellInfo(50977),
     chainsOfIce = GetSpellInfo(45524),
+    empowerRuneWeapon = GetSpellInfo(47568),
 }
 
 local spellKnown = {
@@ -96,6 +97,7 @@ local spellKnown = {
     unbreakableArmor = GMR.IsSpellKnown(spells.unbreakableArmor),
     deathGate = GMR.IsSpellKnown(spells.deathGate),
     chainsOfIce = GMR.IsSpellKnown(spells.chainsOfIce),
+    empowerRuneWeapon = GMR.IsSpellKnown(spells.empowerRuneWeapon),
 }
 
 local glyphSpells = {
@@ -523,15 +525,11 @@ function DKRunes:summary()
 end
 
 local function GetDebuffExpiration(unit, debuff, byPlayer)
-    local spellName, expiration
+    local spellName, expiration, owner
     local byPlayer = byPlayer or false
     for i = 1, 40 do
-        if byPlayer == true then
-            spellName, _, _, _, _, expiration = GMR.UnitDebuff(unit, i, nil, "player")
-        else
-            spellName, _, _, _, _, expiration = GMR.UnitDebuff(unit, i)
-        end
-        if spellName and spellName == debuff then
+        spellName, _, _, _, _, expiration, owner = GMR.UnitDebuff(unit, i)
+        if spellName and spellName == debuff and (not byPlayer or (byPlayer and owner == "player")) then
             if expiration - GMR.GetTime() > 0 then
                 return expiration - GMR.GetTime()
             elseif expiration == 0 then
@@ -546,6 +544,7 @@ end
 function Rotation:execute()
     local spellToCheckGCD = spells.chainsOfIce
     local runes = DKRunes:new()
+    local runesSummary = runes:summary()
     local power = GMR.UnitPower("player")
     local powerMax = GMR.UnitPowerMax("player")
     if GMR.GetTime() > self.state.lastInterruptAttempt + 0.5 then
@@ -844,6 +843,16 @@ function Rotation:execute()
         return
     end
 
+    if spellKnown.empowerRuneWeapon and runesSummary[RUNE_TYPE_UNHOLY] == 0 and runesSummary[RUNE_TYPE_FROST] == 0
+        and ((runesSummary[RUNE_TYPE_BLOOD] == 0 and runesSummary[RUNE_TYPE_DEATH] == 1)
+        or (runesSummary[RUNE_TYPE_BLOOD] == 1 and runesSummary[RUNE_TYPE_DEATH] == 0))
+        and GMR.IsCastable(spells.empowerRuneWeapon, "player")
+    then
+        self.dbgPrint("should cast empower rune weapon")
+        GMR.Cast(spells.empowerRuneWeapon, "player")
+        return
+    end
+
     for _, trinket in ipairs(self.state.trinkets) do
         local itemId = GetInventoryItemID("player", trinket.inventoryId)
         local cooldownStart, duration = GetItemCooldown(itemId)
@@ -894,7 +903,7 @@ function Rotation:execute()
 
     if not (needToCastPestilenceSpell and spellKnown.pestilence) then
         local shouldUseBloodFillers = true
-        if self.cfg.useBloodFillersWithBloodRunesOnly and runes:summary()[RUNE_TYPE_BLOOD] == 0 then
+        if self.cfg.useBloodFillersWithBloodRunesOnly and runesSummary[RUNE_TYPE_BLOOD] == 0 then
             shouldUseBloodFillers = false
         end
         if shouldUseBloodFillers and runes:canConsume("", 1, 0, 0) then
