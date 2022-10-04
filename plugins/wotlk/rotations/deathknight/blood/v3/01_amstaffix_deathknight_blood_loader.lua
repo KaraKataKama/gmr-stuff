@@ -17,8 +17,8 @@
 
 local ID = "CR>DK/B"
 local LIB_LINK = "https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/plugins/wotlk%2Bclassic%2Bretail/custom/00_amstlib.lua"
-local ROTATION_LINK = ""
----@type DeathKnightBloodConfig
+local ROTATION_LINK = "https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/plugins/wotlk/rotations/deathknight/blood/v3/02_amstaffix_deathknight_blood_rotation.lua"
+---@type DeathKnightBloodV3Config
 local Config = {
     ---Toggle debug mode. Turn on, if you encounter some issues and want to deal with it, or record a video and send
     ---to author.
@@ -42,33 +42,17 @@ local Config = {
     --- - 1:blood;
     --- - 2:frost;
     --- - 3:unholy;
-    defaultPresence = 1,
+    defaultPresence = 2,
     ---Change presence on frost, if HP < X. Change it to 0 to turn off
     minHpToChangeToFrostPresence = 60,
     ---Min enemies to cast raise dead spell
     minEnemiesCountToRaiseDead = 2,
 
-    ---Should use Rune Strike
-    useRuneStrike = true,
-    ---Delay between Rune Strike usage. If you encounter some issues with rune strike, tune this option.
-    useRuneStrikeDelay = 0.5,
-
-    useDeathStrike = true,
     ---Min HP to start using Death Strike more often
-    minHPToUseDeathStrikeMoreOften = 90,
-    minHPToUseDeathPact = 80,
-
-    useFrostStrike = true,
-
-    useObliterate = true,
-
-    useHowlingBlast = true,
-    useHowlingBlastMinEnemies = 3,
-
-    useUnbreakableArmor = true,
+    useDeathStrikeMoreOftenMinHP = 90,
+    useDeathPactMinHP = 80,
 
     usePlagueStrikeAsFiller = false,
-
     useIcyTouchAsFiller = false,
 
     useStrangulateToInterruptCasts = true,
@@ -96,9 +80,6 @@ local Config = {
 
     useTrinket2 = false,
     useTrinket2Type = 1, -- 1:self-buff, 2:target-harmful, 3:aoe-harmful
-
-    ---@type AmstLibCombatRotation
-    cr = nil
 }
 
 do

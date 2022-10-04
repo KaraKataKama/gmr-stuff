@@ -42,33 +42,17 @@ local Config = {
     --- - 1:blood;
     --- - 2:frost;
     --- - 3:unholy;
-    defaultPresence = 1,
+    defaultPresence = 2,
     ---Change presence on frost, if HP < X. Change it to 0 to turn off
     minHpToChangeToFrostPresence = 60,
     ---Min enemies to cast raise dead spell
     minEnemiesCountToRaiseDead = 2,
 
-    ---Should use Rune Strike
-    useRuneStrike = true,
-    ---Delay between Rune Strike usage. If you encounter some issues with rune strike, tune this option.
-    useRuneStrikeDelay = 0.5,
-
-    useDeathStrike = true,
     ---Min HP to start using Death Strike more often
-    minHPToUseDeathStrikeMoreOften = 90,
-    minHPToUseDeathPact = 80,
-
-    useFrostStrike = true,
-
-    useObliterate = true,
-
-    useHowlingBlast = true,
-    useHowlingBlastMinEnemies = 3,
-
-    useUnbreakableArmor = true,
+    useDeathStrikeMoreOftenMinHP = 90,
+    useDeathPactMinHP = 80,
 
     usePlagueStrikeAsFiller = false,
-
     useIcyTouchAsFiller = false,
 
     useStrangulateToInterruptCasts = true,
@@ -402,8 +386,6 @@ function Rotation:execute()
 
     local runes = DeathKnightBloodV3Runes:new()
     local runesSummary = runes:summary()
-    local power = GMR.UnitPower("player")
-    local powerMax = GMR.UnitPowerMax("player")
     if GMR.GetTime() > self.state.lastInterruptAttempt + 0.5 then
         for i = 1, #GMR.Tables.Attackables do
             local attackable = GMR.Tables.Attackables[i][1]
@@ -453,7 +435,7 @@ function Rotation:execute()
 
     if amstlib.CONST.CLASSIC.SPELL_KNOWN.raiseDead and GetSpellCooldown(amstlib.CONST.CLASSIC.SPELL.raiseDead) > 0 then
         local secondsLeftAfterCast = GetTime() - GetSpellCooldown(amstlib.CONST.CLASSIC.SPELL.raiseDead)
-        if secondsLeftAfterCast >= 45 and secondsLeftAfterCast <= 60 and GMR.GetHealth("player") < self.cfg.minHPToUseDeathPact
+        if secondsLeftAfterCast >= 45 and secondsLeftAfterCast <= 60 and GMR.GetHealth("player") < self.cfg.useDeathPactMinHP
             and GMR.IsCastable(amstlib.CONST.CLASSIC.SPELL.deathPact, "player")
         then
             self.cr:printDbg("should cast Death Pact to heal")
@@ -462,7 +444,7 @@ function Rotation:execute()
         end
     end
 
-    if self.cfg.useRuneStrike and amstlib.CONST.CLASSIC.SPELL_KNOWN.runeStrike and GMR.IsCastable(amstlib.CONST.CLASSIC.SPELL.runeStrike, "target")
+    if amstlib.CONST.CLASSIC.SPELL_KNOWN.runeStrike and GMR.IsCastable(amstlib.CONST.CLASSIC.SPELL.runeStrike, "target")
         and GetTime() - self.state.lastRuneStrikeUsed > 0.5
     then
         self.cr:printDbg("should turn on rune strike")
@@ -572,28 +554,6 @@ function Rotation:execute()
         return
     end
 
-    if self.cfg.useUnbreakableArmor and amstlib.CONST.CLASSIC.SPELL_KNOWN.unbreakableArmor and amstlib.CONST.CLASSIC.SPELL_KNOWN.bloodTap
-        and GMR.IsCastable(amstlib.CONST.CLASSIC.SPELL.unbreakableArmor, "player")
-        and GMR.GetDistance("player", "target", "<", 6)
-    then
-        local bloodTabUnbreakableArmorComboStage = 0
-        if GMR.HasBuff("player", amstlib.CONST.CLASSIC.BUFF.bloodTap) then
-            bloodTabUnbreakableArmorComboStage = 1
-        end
-
-        if bloodTabUnbreakableArmorComboStage == 0 then
-            if not runes.runes[1].isReady or not runes.runes[2].isReady and GMR.IsCastable(amstlib.CONST.CLASSIC.SPELL.bloodTap, "player") then
-                self.cr:printDbg("should cast blood tap for unbreakable armor combo")
-                GMR.Cast(amstlib.CONST.CLASSIC.SPELL.bloodTap, "player")
-                return
-            end
-        elseif bloodTabUnbreakableArmorComboStage == 1 then
-            self.cr:printDbg("should cast unbreakable armor")
-            GMR.Cast(amstlib.CONST.CLASSIC.SPELL.unbreakableArmor, "player")
-            return
-        end
-    end
-
     if self.cfg.useDeathAndDecay and amstlib.CONST.CLASSIC.SPELL_KNOWN.deathAndDecay
         and GMR.GetNumEnemies("player", 10) >= self.cfg.useDeathAndDecayMinEnemies
         and GMR.IsCastable(amstlib.CONST.CLASSIC.SPELL.deathAndDecay, "player")
@@ -689,38 +649,23 @@ function Rotation:execute()
         end
     end
 
-    if self.cfg.useFrostStrike and amstlib.CONST.CLASSIC.SPELL_KNOWN.frostStrike and GMR.IsCastable(amstlib.CONST.CLASSIC.SPELL.frostStrike, "target")
-        and power > (powerMax - 25)
-    then
-        self.cr:printDbg("should cast frost strike to prevent power overflow")
-        GMR.Cast(amstlib.CONST.CLASSIC.SPELL.frostStrike, "target")
-        return
-    end
-
-    if amstlib.CONST.CLASSIC.SPELL_KNOWN.empowerRuneWeapon and runesSummary[RUNE_TYPE_UNHOLY] == 0 and runesSummary[RUNE_TYPE_FROST] == 0
-        and ((runesSummary[RUNE_TYPE_BLOOD] == 0 and runesSummary[RUNE_TYPE_DEATH] == 1)
-        or (runesSummary[RUNE_TYPE_BLOOD] == 1 and runesSummary[RUNE_TYPE_DEATH] == 0))
-        and GMR.IsCastable(amstlib.CONST.CLASSIC.SPELL.empowerRuneWeapon, "player")
-    then
-        self.cr:printDbg("should cast empower rune weapon")
-        GMR.Cast(amstlib.CONST.CLASSIC.SPELL.empowerRuneWeapon, "player")
-        return
-    end
+    -- TODO
+    --if amstlib.CONST.CLASSIC.SPELL_KNOWN.empowerRuneWeapon and runesSummary[RUNE_TYPE_UNHOLY] == 0 and runesSummary[RUNE_TYPE_FROST] == 0
+    --    and ((runesSummary[RUNE_TYPE_BLOOD] == 0 and runesSummary[RUNE_TYPE_DEATH] == 1)
+    --    or (runesSummary[RUNE_TYPE_BLOOD] == 1 and runesSummary[RUNE_TYPE_DEATH] == 0))
+    --    and GMR.IsCastable(amstlib.CONST.CLASSIC.SPELL.empowerRuneWeapon, "player")
+    --then
+    --    self.cr:printDbg("should cast empower rune weapon")
+    --    GMR.Cast(amstlib.CONST.CLASSIC.SPELL.empowerRuneWeapon, "player")
+    --    return
+    --end
 
     if self.trinketer:useTrinkets() then
         return
     end
 
-    if GMR.HasBuff("player", amstlib.CONST.CLASSIC.BUFF.freezingFog) and amstlib.CONST.CLASSIC.SPELL_KNOWN.howlingBlast
-        and GMR.IsCastable(amstlib.CONST.CLASSIC.SPELL.howlingBlast, "target")
-    then
-        self.cr:printDbg("should cast howling blast to consume freezing fog buff")
-        GMR.Cast(amstlib.CONST.CLASSIC.SPELL.howlingBlast, "target")
-        return
-    end
-
     -- we need hp in first place, after that we will use some damage spells
-    if self.cfg.useDeathStrike and GMR.GetHealth("player") < self.cfg.minHPToUseDeathStrikeMoreOften
+    if GMR.GetHealth("player") < self.cfg.useDeathStrikeMoreOftenMinHP
         and GMR.IsCastable(amstlib.CONST.CLASSIC.SPELL.deathStrike, "target")
         and GMR.IsSpellInRange(amstlib.CONST.CLASSIC.SPELL.deathStrike, "target")
     then
@@ -737,57 +682,45 @@ function Rotation:execute()
         end
     end
 
-    if not (needToCastPestilenceSpell and amstlib.CONST.CLASSIC.SPELL_KNOWN.pestilence) then
-        local shouldUseBloodFillers = true
-        if self.cfg.useBloodFillersWithBloodRunesOnly and runesSummary[RUNE_TYPE_BLOOD] == 0 then
-            shouldUseBloodFillers = false
+    local shouldUseBloodFillers = true
+    if self.cfg.useBloodFillersWithBloodRunesOnly and runesSummary[RUNE_TYPE_BLOOD] == 0 then
+        shouldUseBloodFillers = false
+    end
+    if shouldUseBloodFillers and runes:canConsume("", 1, 0, 0) then
+        local shouldUseBloodBoil = self.cfg.bloodBoilEnabled and enemiesAround >= self.cfg.bloodBoilMinEnemies
+        if shouldUseBloodBoil and GMR.IsCastable(amstlib.CONST.CLASSIC.SPELL.bloodBoil, "player") then
+            self.cr:printDbg("should use blood boil")
+            GMR.Cast(amstlib.CONST.CLASSIC.SPELL.bloodBoil, "player")
+            return
         end
-        if shouldUseBloodFillers and runes:canConsume("", 1, 0, 0) then
-            local shouldUseBloodBoil = self.cfg.bloodBoilEnabled and enemiesAround >= self.cfg.bloodBoilMinEnemies
-            if shouldUseBloodBoil and GMR.IsCastable(amstlib.CONST.CLASSIC.SPELL.bloodBoil, "player") then
-                self.cr:printDbg("should use blood boil")
-                GMR.Cast(amstlib.CONST.CLASSIC.SPELL.bloodBoil, "player")
+        if amstlib.CONST.CLASSIC.SPELL_KNOWN.heartStrike then
+            if GMR.IsCastable(amstlib.CONST.CLASSIC.SPELL.heartStrike, "target")
+                and GMR.IsSpellInRange(amstlib.CONST.CLASSIC.SPELL.heartStrike, "target")
+            then
+                self.cr:printDbg("should use heart strike")
+                GMR.Cast(amstlib.CONST.CLASSIC.SPELL.heartStrike, "target")
                 return
             end
-            if amstlib.CONST.CLASSIC.SPELL_KNOWN.heartStrike then
-                if GMR.IsCastable(amstlib.CONST.CLASSIC.SPELL.heartStrike, "target") and GMR.IsSpellInRange(amstlib.CONST.CLASSIC.SPELL.heartStrike, "target") then
-                    self.cr:printDbg("should use heart strike")
-                    GMR.Cast(amstlib.CONST.CLASSIC.SPELL.heartStrike, "target")
-                    return
-                end
-            else
-                if GMR.IsCastable(amstlib.CONST.CLASSIC.SPELL.bloodStrike, "target") and GMR.IsSpellInRange(amstlib.CONST.CLASSIC.SPELL.bloodStrike, "target") then
-                    self.cr:printDbg("should use blood strike")
-                    GMR.Cast(amstlib.CONST.CLASSIC.SPELL.bloodStrike, "target")
-                    return
-                end
+        else
+            if GMR.IsCastable(amstlib.CONST.CLASSIC.SPELL.bloodStrike, "target")
+                and GMR.IsSpellInRange(amstlib.CONST.CLASSIC.SPELL.bloodStrike, "target")
+            then
+                self.cr:printDbg("should use blood strike")
+                GMR.Cast(amstlib.CONST.CLASSIC.SPELL.bloodStrike, "target")
+                return
             end
         end
-    end
-
-    if self.cfg.useHowlingBlast and amstlib.CONST.CLASSIC.SPELL_KNOWN.howlingBlast
-        and GMR.GetNumEnemies("target", 10) >= self.cfg.useHowlingBlastMinEnemies - 1
-        and GMR.IsCastable(amstlib.CONST.CLASSIC.SPELL.howlingBlast, "target")
-        and runes:canConsume("", 0, 1, 1)
-    then
-        self.cr:printDbg("should cast howling blast to make aoe dmg")
-        GMR.Cast(amstlib.CONST.CLASSIC.SPELL.howlingBlast, "target")
-        return
     end
 
     -- filler to spent unholy and frost runes
-    if amstlib.CONST.CLASSIC.SPELL_KNOWN.deathStrike and self.cfg.useDeathStrike then
-        if GMR.IsCastable(amstlib.CONST.CLASSIC.SPELL.deathStrike, "target") and GMR.IsSpellInRange(amstlib.CONST.CLASSIC.SPELL.deathStrike, "target") then
+    if amstlib.CONST.CLASSIC.SPELL_KNOWN.deathStrike then
+        if GMR.IsCastable(amstlib.CONST.CLASSIC.SPELL.deathStrike, "target")
+            and GMR.IsSpellInRange(amstlib.CONST.CLASSIC.SPELL.deathStrike, "target")
+        then
             self.cr:printDbg("should use death strike as a filler")
             GMR.Cast(amstlib.CONST.CLASSIC.SPELL.deathStrike, "target")
             return
         end
-    elseif self.cfg.useObliterate and amstlib.CONST.CLASSIC.SPELL_KNOWN.obliterate and GMR.IsCastable(amstlib.CONST.CLASSIC.SPELL.obliterate, "target")
-        and runes:canConsume("", 0, 1, 1)
-    then
-        self.cr:printDbg("should use obliterate as a filler")
-        GMR.Cast(amstlib.CONST.CLASSIC.SPELL.obliterate, "target")
-        return
     else
         if self.cfg.usePlagueStrikeAsFiller and GMR.IsCastable(amstlib.CONST.CLASSIC.SPELL.plagueStrike, "target")
             and GMR.IsSpellInRange(amstlib.CONST.CLASSIC.SPELL.plagueStrike, "target")
@@ -804,14 +737,6 @@ function Rotation:execute()
             GMR.Cast(amstlib.CONST.CLASSIC.SPELL.icyTouch, "target")
             return
         end
-    end
-
-    if self.cfg.useFrostStrike and amstlib.CONST.CLASSIC.SPELL_KNOWN.frostStrike and GMR.IsCastable(amstlib.CONST.CLASSIC.SPELL.frostStrike, "target")
-        and GMR.HasBuff("player", amstlib.CONST.CLASSIC.BUFF.killingMachine)
-    then
-        self.cr:printDbg("should cast frost strike to consume killing machine buff")
-        GMR.Cast(amstlib.CONST.CLASSIC.SPELL.frostStrike, "target")
-        return
     end
 
     if not GMR.HasBuff("player", amstlib.CONST.CLASSIC.SPELL.hornOfWinter) and GMR.IsCastable(amstlib.CONST.CLASSIC.SPELL.hornOfWinter, "player")
