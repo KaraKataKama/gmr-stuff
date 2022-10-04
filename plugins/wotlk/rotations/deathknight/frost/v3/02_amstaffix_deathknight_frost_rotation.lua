@@ -54,10 +54,10 @@ local Config = {
     useDeathAndDecay = false,
     useDeathAndDecayMinEnemies = 3,
 
-    useDeathCoilOnEnemy = true,
+    useDeathCoilOnEnemy = false,
     useDeathCoilOnEnemyMaxEnemies = 1,
 
-    useCorpseExplosion = true,
+    useCorpseExplosion = false,
     useCorpseExplosionMinEnemies = 3,
 
     useTrinket1 = false,
