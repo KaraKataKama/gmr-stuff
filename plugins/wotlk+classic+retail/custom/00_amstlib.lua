@@ -16,7 +16,9 @@
 --along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 local isSuccess, err = pcall(function()
-    GMR.Print("amstslib loading started...")
+    if amstlib then
+        return -- skip double loaded situations
+    end
     ---@class AmstLib
     amstlib = {}
     ---@type table<string, AmstLibCombatRotation>
@@ -809,8 +811,6 @@ local isSuccess, err = pcall(function()
 
         return false
     end
-
-    GMR.Print("amstlib successfully loaded")
 end)
 
 if not isSuccess then
