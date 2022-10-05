@@ -510,9 +510,6 @@ local isSuccess, err = pcall(function()
                 Method = "Get",
                 Callback = function(content)
                     RunScript(content)
-                    if not self.isInitialized then
-                        self:printError("Rotation have not loaded properly!")
-                    end
                 end
             })
         else
