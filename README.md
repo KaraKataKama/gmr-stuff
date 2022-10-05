@@ -32,11 +32,11 @@ In `backside/` you should place files, that client should not see, like:
 #### How to make a combat rotation
 1. create directory for clients `clientside/plugins/rotations/{classname}/{specname}/`
 2. in that directory create files:
-   - `01_{author}_{classname}_{space_name}_loader.lua`
+   - `01_{author}_{classname}_{specname}_loader.lua`
    - `README.md`
 3. create directory for developers `backside/plugins/rotations/{classname}/{specname}/`
 4. in developer's dir create these files:
-   - `02_{author}_{classname}_{space_name}_rotation.lua`
+   - `02_{author}_{classname}_{specname}_rotation.lua`
    - maybe some other files, that you will need
 
 ### Q&A
