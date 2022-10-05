@@ -31,7 +31,7 @@ local Config = {
     iceboundFortitudeHpUse = 50,
     bloodBoilEnabled = true,
     ---Should bot use only blood runes for blood-runes offensive spells like Blood Boil, Heart/Blood Strike
-    useBloodFillersWithBloodRunesOnly = true,
+    useBloodFillersWithBloodRunesOnly = false,
     ---Min enemies to start using Blood Boil instead off Blood Strike
     bloodBoilMinEnemies = 3,
     ---Default presence

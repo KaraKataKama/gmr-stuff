@@ -25,116 +25,6 @@ local isSuccess, err = pcall(function()
     amstlib.combatRotations = {}
 
     amstlib.CONST = {}
-    amstlib.CONST.RETAIL = {}
-    amstlib.CONST.RETAIL.SPELL = {
-        sunfire = GetSpellInfo(93402),
-        starfire = GetSpellInfo(194153),
-        starfall = GetSpellInfo(191034),
-        starsurge = GetSpellInfo(78674),
-        furyOfElune = GetSpellInfo(202770),
-    }
-    amstlib.CONST.RETAIL.SPELL_KNOWN = {
-        sunfire = GMR.IsSpellKnown(amstlib.CONST.RETAIL.SPELL.sunfire),
-        starfire = GMR.IsSpellKnown(amstlib.CONST.RETAIL.SPELL.starfire),
-        starfall = GMR.IsSpellKnown(amstlib.CONST.RETAIL.SPELL.starfall),
-        starsurge = GMR.IsSpellKnown(amstlib.CONST.RETAIL.SPELL.starsurge),
-        furyOfElune = GMR.IsSpellKnown(amstlib.CONST.RETAIL.SPELL.furyOfElune),
-    }
-    amstlib.CONST.RETAIL.BUFF = {
-        eclipseLunar = GetSpellInfo(48518),
-        eclipseSolar = GetSpellInfo(48517),
-    }
-    amstlib.CONST.RETAIL.DEBUFF = {
-        sunfire = GetSpellInfo(164815)
-    }
-
-    amstlib.CONST.CLASSIC = {}
-    amstlib.CONST.CLASSIC.SPELL = {
-        plagueStrike = GetSpellInfo(45462),
-        bloodPlague = GetSpellInfo(55078), -- plagues strike's debuff
-        icyTouch = GetSpellInfo(45477),
-        frostFever = GetSpellInfo(55095), -- icy touch's debuff
-        pestilence = GetSpellInfo(50842),
-        heartStrike = GetSpellInfo(55050),
-        bloodStrike = GetSpellInfo(45902),
-        deathStrike = GetSpellInfo(49998),
-        runeTap = GetSpellInfo(48982),
-        vampiricBlood = GetSpellInfo(55233),
-        iceboundFortitude = GetSpellInfo(48792),
-        bloodBoil = GetSpellInfo(48721),
-        bloodTap = GetSpellInfo(45529),
-        deathCoil = GetSpellInfo(47541),
-        bloodPresence = GetSpellInfo(48266),
-        frostPresence = GetSpellInfo(48263),
-        unholyPresence = GetSpellInfo(48265),
-        runeStrike = GetSpellInfo(56815),
-        raiseDead = GetSpellInfo(46584),
-        deathPact = GetSpellInfo(48743),
-        hornOfWinter = GetSpellInfo(57330),
-        mindFreeze = GetSpellInfo(47528),
-        strangulate = GetSpellInfo(47476),
-        deathGrip = GetSpellInfo(49576),
-        arcaneTorrent = GetSpellInfo(50613),
-        unholyFrenzy = GetSpellInfo(49016),
-        deathAndDecay = GetSpellInfo(49936),
-        dancingRuneWeapon = GetSpellInfo(49028),
-        markOfBlood = GetSpellInfo(49005),
-        corpseExplosion = GetSpellInfo(51328),
-        frostStrike = GetSpellInfo(51418),
-        obliterate = GetSpellInfo(51423),
-        howlingBlast = GetSpellInfo(51409),
-        unbreakableArmor = GetSpellInfo(51271),
-        deathGate = GetSpellInfo(50977),
-        chainsOfIce = GetSpellInfo(45524),
-        empowerRuneWeapon = GetSpellInfo(47568),
-    }
-    amstlib.CONST.CLASSIC.SPELL_KNOWN = {
-        pestilence = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.pestilence),
-        heartStrike = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.heartStrike),
-        deathStrike = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.deathStrike),
-        runeTap = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.runeTap),
-        vampiricBlood = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.vampiricBlood),
-        iceboundFortitude = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.iceboundFortitude),
-        bloodBoil = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.bloodBoil),
-        bloodTap = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.bloodTap),
-        frostPresence = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.frostPresence),
-        unholyPresence = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.unholyPresence),
-        runeStrike = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.runeStrike),
-        raiseDead = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.raiseDead),
-        hornOfWinter = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.hornOfWinter),
-        mindFreeze = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.mindFreeze),
-        strangulate = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.strangulate),
-        deathGrip = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.deathGrip),
-        arcaneTorrent = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.arcaneTorrent),
-        unholyFrenzy = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.unholyFrenzy),
-        deathAndDecay = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.deathAndDecay),
-        dancingRuneWeapon = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.dancingRuneWeapon),
-        markOfBlood = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.markOfBlood),
-        corpseExplosion = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.corpseExplosion),
-        frostStrike = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.frostStrike),
-        obliterate = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.obliterate),
-        howlingBlast = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.howlingBlast),
-        unbreakableArmor = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.unbreakableArmor),
-        deathGate = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.deathGate),
-        chainsOfIce = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.chainsOfIce),
-        empowerRuneWeapon = GMR.IsSpellKnown(amstlib.CONST.CLASSIC.SPELL.empowerRuneWeapon),
-    }
-    amstlib.CONST.CLASSIC.BUFF = {
-        killingMachine = GetSpellInfo(51124),
-        freezingFog = GetSpellInfo(59052),
-        bloodTap = GetSpellInfo(45529),
-    }
-    amstlib.CONST.CLASSIC.DEBUFF = {
-        bloodPlague = GetSpellInfo(55078), -- plagues strike's debuff
-        frostFever = GetSpellInfo(55095), -- icy touch's debuff
-    }
-    amstlib.CONST.CLASSIC.GLYPH = {
-        glyphOfDisease = GetSpellInfo(63334),
-        glyphOfPestilence = GetSpellInfo(59309),
-        glyphOfRaiseDead = GetSpellInfo(60200),
-    }
-
-    ---@deprecated
     amstlib.CONST.SPELL = {
         exorcism = GetSpellInfo(5614),
         flashOfLight = GetSpellInfo(19939),
@@ -210,9 +100,45 @@ local isSuccess, err = pcall(function()
         prowl = GetSpellInfo(5215),
         wrath = GetSpellInfo(190984),
         moonfire = GetSpellInfo(8921),
+        plagueStrike = GetSpellInfo(45462),
+        bloodPlague = GetSpellInfo(55078), -- plagues strike's debuff
+        icyTouch = GetSpellInfo(45477),
+        frostFever = GetSpellInfo(55095), -- icy touch's debuff
+        pestilence = GetSpellInfo(50842),
+        heartStrike = GetSpellInfo(55050),
+        bloodStrike = GetSpellInfo(45902),
+        deathStrike = GetSpellInfo(49998),
+        runeTap = GetSpellInfo(48982),
+        vampiricBlood = GetSpellInfo(55233),
+        iceboundFortitude = GetSpellInfo(48792),
+        bloodBoil = GetSpellInfo(48721),
+        bloodTap = GetSpellInfo(45529),
+        deathCoil = GetSpellInfo(47541),
+        bloodPresence = GetSpellInfo(48266),
+        frostPresence = GetSpellInfo(48263),
+        unholyPresence = GetSpellInfo(48265),
+        runeStrike = GetSpellInfo(56815),
+        raiseDead = GetSpellInfo(46584),
+        deathPact = GetSpellInfo(48743),
+        hornOfWinter = GetSpellInfo(57330),
+        mindFreeze = GetSpellInfo(47528),
+        strangulate = GetSpellInfo(47476),
+        deathGrip = GetSpellInfo(49576),
+        arcaneTorrent = GetSpellInfo(50613),
+        unholyFrenzy = GetSpellInfo(49016),
+        deathAndDecay = GetSpellInfo(49936),
+        dancingRuneWeapon = GetSpellInfo(49028),
+        markOfBlood = GetSpellInfo(49005),
+        corpseExplosion = GetSpellInfo(51328),
+        frostStrike = GetSpellInfo(51418),
+        obliterate = GetSpellInfo(51423),
+        howlingBlast = GetSpellInfo(51409),
+        unbreakableArmor = GetSpellInfo(51271),
+        deathGate = GetSpellInfo(50977),
+        chainsOfIce = GetSpellInfo(45524),
+        empowerRuneWeapon = GetSpellInfo(47568),
     }
 
-    ---@deprecated
     amstlib.CONST.SPELL_KNOWN = {
         exorcism = GMR.IsSpellKnown(amstlib.CONST.SPELL.exorcism),
         flashOfLight = GMR.IsSpellKnown(amstlib.CONST.SPELL.flashOfLight),
@@ -287,9 +213,37 @@ local isSuccess, err = pcall(function()
         prowl = GMR.IsSpellKnown(amstlib.CONST.SPELL.prowl),
         wrath = GMR.IsSpellKnown(amstlib.CONST.SPELL.wrath),
         moonfire = GMR.IsSpellKnown(amstlib.CONST.SPELL.moonfire),
+        pestilence = GMR.IsSpellKnown(amstlib.CONST.SPELL.pestilence),
+        heartStrike = GMR.IsSpellKnown(amstlib.CONST.SPELL.heartStrike),
+        deathStrike = GMR.IsSpellKnown(amstlib.CONST.SPELL.deathStrike),
+        runeTap = GMR.IsSpellKnown(amstlib.CONST.SPELL.runeTap),
+        vampiricBlood = GMR.IsSpellKnown(amstlib.CONST.SPELL.vampiricBlood),
+        iceboundFortitude = GMR.IsSpellKnown(amstlib.CONST.SPELL.iceboundFortitude),
+        bloodBoil = GMR.IsSpellKnown(amstlib.CONST.SPELL.bloodBoil),
+        bloodTap = GMR.IsSpellKnown(amstlib.CONST.SPELL.bloodTap),
+        frostPresence = GMR.IsSpellKnown(amstlib.CONST.SPELL.frostPresence),
+        unholyPresence = GMR.IsSpellKnown(amstlib.CONST.SPELL.unholyPresence),
+        runeStrike = GMR.IsSpellKnown(amstlib.CONST.SPELL.runeStrike),
+        raiseDead = GMR.IsSpellKnown(amstlib.CONST.SPELL.raiseDead),
+        hornOfWinter = GMR.IsSpellKnown(amstlib.CONST.SPELL.hornOfWinter),
+        mindFreeze = GMR.IsSpellKnown(amstlib.CONST.SPELL.mindFreeze),
+        strangulate = GMR.IsSpellKnown(amstlib.CONST.SPELL.strangulate),
+        deathGrip = GMR.IsSpellKnown(amstlib.CONST.SPELL.deathGrip),
+        arcaneTorrent = GMR.IsSpellKnown(amstlib.CONST.SPELL.arcaneTorrent),
+        unholyFrenzy = GMR.IsSpellKnown(amstlib.CONST.SPELL.unholyFrenzy),
+        deathAndDecay = GMR.IsSpellKnown(amstlib.CONST.SPELL.deathAndDecay),
+        dancingRuneWeapon = GMR.IsSpellKnown(amstlib.CONST.SPELL.dancingRuneWeapon),
+        markOfBlood = GMR.IsSpellKnown(amstlib.CONST.SPELL.markOfBlood),
+        corpseExplosion = GMR.IsSpellKnown(amstlib.CONST.SPELL.corpseExplosion),
+        frostStrike = GMR.IsSpellKnown(amstlib.CONST.SPELL.frostStrike),
+        obliterate = GMR.IsSpellKnown(amstlib.CONST.SPELL.obliterate),
+        howlingBlast = GMR.IsSpellKnown(amstlib.CONST.SPELL.howlingBlast),
+        unbreakableArmor = GMR.IsSpellKnown(amstlib.CONST.SPELL.unbreakableArmor),
+        deathGate = GMR.IsSpellKnown(amstlib.CONST.SPELL.deathGate),
+        chainsOfIce = GMR.IsSpellKnown(amstlib.CONST.SPELL.chainsOfIce),
+        empowerRuneWeapon = GMR.IsSpellKnown(amstlib.CONST.SPELL.empowerRuneWeapon),
     }
 
-    ---@deprecated
     amstlib.CONST.BUFF = {
         theArtOfWar = GetSpellInfo(59578),
         blessingOfMight = GetSpellInfo(19837),
@@ -323,15 +277,26 @@ local isSuccess, err = pcall(function()
         predatorySwiftness = GetSpellInfo(69369),
         catForm = GetSpellInfo(768),
         prowl = GetSpellInfo(5215),
+        killingMachine = GetSpellInfo(51124),
+        freezingFog = GetSpellInfo(59052),
+        bloodTap = GetSpellInfo(45529),
     }
 
-    ---@deprecated
     amstlib.CONST.DEBUFF = {
         sinfulBrand = GetSpellInfo(317009),
         rake = GetSpellInfo(155722),
         rip = GetSpellInfo(1079),
         thrash = GetSpellInfo(106830),
         moonfire = GetSpellInfo(164812),
+        bloodPlague = GetSpellInfo(55078), -- plagues strike's debuff
+        frostFever = GetSpellInfo(55095), -- icy touch's debuff
+    }
+
+    amstlib.CONST.GLYPH = {
+        glyphOfDisease = GetSpellInfo(63334),
+        glyphOfPestilence = GetSpellInfo(59309),
+        glyphOfRaiseDead = GetSpellInfo(60200),
+        glyphofFrostStrike = GetSpellInfo(57216),
     }
 
     amstlib.CONST.INVENTORY = {}

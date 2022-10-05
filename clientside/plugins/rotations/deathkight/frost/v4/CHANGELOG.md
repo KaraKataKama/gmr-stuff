@@ -1,6 +1,7 @@
 # CHANGELOG:
 ## v4.0.0
 - another attempt to make better layout for plugins
+- change spell priorities to increase dps even more
 ## v3.0.0
 - separated frost and blood rotations to make them easier to maintain and configure
 - applied my lib
