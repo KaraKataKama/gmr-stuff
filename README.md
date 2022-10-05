@@ -36,7 +36,7 @@ In `backside/` you should place files, that client should not see, like:
    - `README.md`
 3. create directory for developers `backside/plugins/rotations/{classname}/{specname}/`
 4. in developer's dir create these files:
-   - `01_{author}_{classname}_{space_name}_rotation.lua`
+   - `02_{author}_{classname}_{space_name}_rotation.lua`
    - maybe some other files, that you will need
 
 ### Q&A
