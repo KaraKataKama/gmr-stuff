@@ -17,7 +17,7 @@
 
 local ID = "CR>DK/F"
 local LIB_LINK = "https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/backside/plugins/custom/00_amstlib.lua"
-local ROTATION_LINK = ""
+local ROTATION_LINK = "https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/backside/plugins/rotations/deathknight/frost/v4/02_amstaffix_deathknight_frost_rotation.lua"
 ---@type DeathKnightFrostV4Config
 local Config = {
     ---Toggle debug mode. Turn on, if you encounter some issues and want to deal with it, or record a video and send

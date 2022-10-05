@@ -10,7 +10,7 @@
 ## Installation
 - delete previous versions!
 - turn off all spells in Spells tab
-- download [01_amstaffix_deathknight_frost_loader.lua](LINK) 
+- download [01_amstaffix_deathknight_frost_loader.lua](https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/clientside/plugins/rotations/deathkight/frost/v4/01_amstaffix_deathknight_frost_loader.lua) 
 - place downloaded file `01_amstaffix_deathknight_frost_loader.lua` into
   - HWT: `{HWT_Dir}/addons/Wrath of the Lichking/Plugins/`
   - Tinkr: `{Tinkr_Dir}/scripts/GMR/Plugins/`
