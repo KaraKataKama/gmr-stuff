@@ -51,7 +51,19 @@ Because not all clients read carefully `Installation` section of `README.md` and
 folder, that always encounter issues
 
 ### Common `README.md` parts
-#### Combat rotation troubleshooting
+#### Combat rotation `Installation` section
+- you should replace `FILE_NAME` and `LINK_TO_YOUR_FILE` to your own 
+```
+## Installation
+- delete previous versions!
+- {your own instruction to do something, like turn off specific spells in Spells tab etc}
+- download [{FILE_NAME}]({LINK_TO_YOUR_FILE})
+- place downloaded file `{FILE_NAME}` into
+  - HWT: `{HWT_Dir}/addons/Wrath of the Lichking/Plugins/`
+  - Tinkr: `{Tinkr_Dir}/scripts/GMR/Plugins/`
+```
+#### Combat rotation `Troubleshooting`
+- you should replace `YOUR_DISCORD_ID` to your own
 ```
 ## Troubleshooting
 If you encounter problems you should:
@@ -59,7 +71,7 @@ If you encounter problems you should:
 - do not hide chat window
 - record a video (from start of client till encountered issue)
 - DM to **{YOUR_DISCORD_ID}** with
-   - Unlocker type (HWT, Tinkr, Magick)
+   - Unlocker type (HWT, Tinkr, Magic)
    - Description of issue
    - Video as attachment/link
    - Downloaded plugin as attachment
