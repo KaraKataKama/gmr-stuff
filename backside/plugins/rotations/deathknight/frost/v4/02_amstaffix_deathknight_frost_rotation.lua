@@ -641,6 +641,15 @@ function Rotation:execute()
         end
     end
 
+    -- filler to spent unholy and frost runes
+    if amstlib.CONST.SPELL_KNOWN.obliterate and GMR.IsCastable(amstlib.CONST.SPELL.obliterate, "target")
+        and runes:canConsume("", 0, 1, 1)
+    then
+        self.cr:printDbg("should use obliterate as a filler")
+        GMR.Cast(amstlib.CONST.SPELL.obliterate, "target")
+        return
+    end
+
     if not (needToCastPestilenceSpell and amstlib.CONST.SPELL_KNOWN.pestilence) then
         local shouldUseBloodFillers = true
         if self.cfg.useBloodFillersWithBloodRunesOnly and runesSummary[RUNE_TYPE_BLOOD] == 0 then
@@ -667,15 +676,6 @@ function Rotation:execute()
                 end
             end
         end
-    end
-
-    -- filler to spent unholy and frost runes
-    if amstlib.CONST.SPELL_KNOWN.obliterate and GMR.IsCastable(amstlib.CONST.SPELL.obliterate, "target")
-        and runes:canConsume("", 0, 1, 1)
-    then
-        self.cr:printDbg("should use obliterate as a filler")
-        GMR.Cast(amstlib.CONST.SPELL.obliterate, "target")
-        return
     end
 
     if amstlib.CONST.SPELL_KNOWN.frostStrike and GMR.IsCastable(amstlib.CONST.SPELL.frostStrike, "target") then
