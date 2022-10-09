@@ -110,22 +110,6 @@ function Rotation:new(cfg, state, cr, trinketer)
     return o
 end
 
-local function GetDebuffExpiration(unit, debuff, byPlayer)
-    local spellName, expiration, owner
-    local byPlayer = byPlayer or false
-    for i = 1, 40 do
-        spellName, _, _, _, _, expiration, owner = GMR.UnitDebuff(unit, i)
-        if spellName and spellName == debuff and (not byPlayer or (byPlayer and owner == "player")) then
-            if expiration - GMR.GetTime() > 0 then
-                return expiration - GMR.GetTime()
-            elseif expiration == 0 then
-                return 99999
-            end
-        end
-    end
-    return 0
-end
-
 ---@return void
 function Rotation:execute()
     if self:isStunned() then
