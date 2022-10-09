@@ -63,6 +63,6 @@ I will be very grateful for a cup of coffee :)
 - [NOWPayments](https://nowpayments.io/donation/AmsTaFFix)
 
 ### My Wallets
-- **BTC** - bc1ql730vv096l5se535hllsst6367d3j27n5e0a7x
-- **LTC** - ltc1qgt8asz8wn5t8erjqdm4zhsde5h4vrzwmz648zx
-- **USDT TRC20** - TN9BKkVK1Nv7g67rSCNQLyf4uQZyEwZUcE
+- **BTC** - 1FL5Cw8bjG7UDbLBAkayXv8j8nAWXys897
+- **LTC** - ltc1ql9lzdv070qdzwu4hgwz4xj5wy0sx4uyz7uek0y
+- **USDT TRC20** - TSMDyHz95MBpjECvfphDGoNYpDZeu4B8cd
