@@ -545,7 +545,9 @@ local isSuccess, err = pcall(function()
                 Method = "Get",
                 Callback = function(content)
                     RunScript(content)
-                    callback()
+                    if callback then
+                        callback()
+                    end
                 end
             })
         else
