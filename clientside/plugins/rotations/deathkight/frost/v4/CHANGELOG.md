@@ -1,4 +1,6 @@
 # CHANGELOG:
+## v4.0.1
+- moved function to work with debuffs in lib
 ## v4.0.0
 - another attempt to make better layout for plugins
 - change spell priorities to increase dps even more

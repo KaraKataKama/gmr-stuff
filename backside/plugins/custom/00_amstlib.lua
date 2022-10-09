@@ -24,6 +24,32 @@ local isSuccess, err = pcall(function()
     ---@type table<string, AmstLibCombatRotation>
     amstlib.combatRotations = {}
 
+    ---Check debuff expiration.
+    ---
+    ---I have to add my own version of that function, because GMR's not properly works, for example with death knight's
+    ---diseases, when you are in a party with another DK
+    ---
+    ---@param unit string|userdata
+    ---@param debuff string debuff's name
+    ---@param byPlayer boolean work only with debuffs that sources from player
+    ---@return number seconds to expire. 0 if not found, 99999 if infinite
+    function amstlib.GetDebuffExpiration(unit, debuff, byPlayer)
+        local spellName, expiration, owner
+        local byPlayer = byPlayer or false
+        for i = 1, 40 do
+            spellName, _, _, _, _, expiration, owner = GMR.UnitDebuff(unit, i)
+            if spellName and spellName == debuff and (not byPlayer or (byPlayer and owner == "player")) then
+                if expiration - GMR.GetTime() > 0 then
+                    return expiration - GMR.GetTime()
+                elseif expiration == 0 then
+                    return 99999
+                end
+            end
+        end
+
+        return 0
+    end
+
     amstlib.CONST = {}
     amstlib.CONST.SPELL = {
         exorcism = GetSpellInfo(5614),

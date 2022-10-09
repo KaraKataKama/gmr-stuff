@@ -16,7 +16,7 @@
 --along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 local ID = "CR>DK/B"
-local VERSION = "v4.0.0"
+local VERSION = "v4.0.1"
 
 ---@class DeathKnightBloodV4Config
 local Config = {
@@ -325,22 +325,6 @@ function Rotation:new(cfg, state, cr, trinketer)
     return o
 end
 
-local function GetDebuffExpiration(unit, debuff, byPlayer)
-    local spellName, expiration, owner
-    local byPlayer = byPlayer or false
-    for i = 1, 40 do
-        spellName, _, _, _, _, expiration, owner = GMR.UnitDebuff(unit, i)
-        if spellName and spellName == debuff and (not byPlayer or (byPlayer and owner == "player")) then
-            if expiration - GMR.GetTime() > 0 then
-                return expiration - GMR.GetTime()
-            elseif expiration == 0 then
-                return 99999
-            end
-        end
-    end
-    return 0
-end
-
 ---@return boolean spell casted
 function Rotation:useSpellWithPreBloodTap(spell, unit)
     -- spell cd and shortage on runes use same cooldown info, so we can understand which type of CD it only by CD
@@ -563,8 +547,8 @@ function Rotation:execute()
         return
     end
 
-    local targetBloodPlagueDuration = GetDebuffExpiration("target", amstlib.CONST.SPELL.bloodPlague, true)
-    local targetFrostFeverDuration = GetDebuffExpiration("target", amstlib.CONST.SPELL.frostFever, true)
+    local targetBloodPlagueDuration = amstlib.GetDebuffExpiration("target", amstlib.CONST.SPELL.bloodPlague, true)
+    local targetFrostFeverDuration = amstlib.GetDebuffExpiration("target", amstlib.CONST.SPELL.frostFever, true)
 
     local shouldCastPlagueStrike = false
     local shouldCastIcyTouch = false
@@ -609,8 +593,8 @@ function Rotation:execute()
         if GMR.ObjectExists(attackable) and GMR.UnitLevel(attackable) > 1
             and GMR.GetDistance("player", attackable, "<", self.state.pestilenceRadius)
         then
-            local attackableBloodPlagueDuration = GetDebuffExpiration(attackable, amstlib.CONST.SPELL.bloodPlague, true)
-            local attackableFrostFeverDuration = GetDebuffExpiration(attackable, amstlib.CONST.SPELL.frostFever, true)
+            local attackableBloodPlagueDuration = amstlib.GetDebuffExpiration(attackable, amstlib.CONST.SPELL.bloodPlague, true)
+            local attackableFrostFeverDuration = amstlib.GetDebuffExpiration(attackable, amstlib.CONST.SPELL.frostFever, true)
             if attackableBloodPlagueDuration < 3 or attackableFrostFeverDuration < 3 then
                 enemiesToTransferDebuff = enemiesToTransferDebuff + 1
             else
