@@ -163,6 +163,13 @@ local isSuccess, err = pcall(function()
         deathGate = GetSpellInfo(50977),
         chainsOfIce = GetSpellInfo(45524),
         empowerRuneWeapon = GetSpellInfo(47568),
+        blessingOfWisdom = GetSpellInfo(27142),
+        sealOfCorruption = GetSpellInfo(348704),
+        sealOfVengeance = GetSpellInfo(31801),
+        fireResistanceAura = GetSpellInfo(27153),
+        holyLight = GetSpellInfo(25292),
+        holyShock = GetSpellInfo(33072),
+        shieldOfRighteousness = GetSpellInfo(53600),
     }
 
     amstlib.CONST.SPELL_KNOWN = {
@@ -268,6 +275,13 @@ local isSuccess, err = pcall(function()
         deathGate = GMR.IsSpellKnown(amstlib.CONST.SPELL.deathGate),
         chainsOfIce = GMR.IsSpellKnown(amstlib.CONST.SPELL.chainsOfIce),
         empowerRuneWeapon = GMR.IsSpellKnown(amstlib.CONST.SPELL.empowerRuneWeapon),
+        blessingOfWisdom = GMR.IsSpellKnown(amstlib.CONST.SPELL.blessingOfWisdom),
+        sealOfCorruption = GMR.IsSpellKnown(amstlib.CONST.SPELL.sealOfCorruption),
+        sealOfVengeance = GMR.IsSpellKnown(amstlib.CONST.SPELL.sealOfVengeance),
+        fireResistanceAura = GMR.IsSpellKnown(amstlib.CONST.SPELL.fireResistanceAura),
+        holyLight = GMR.IsSpellKnown(amstlib.CONST.SPELL.holyLight),
+        holyShock = GMR.IsSpellKnown(amstlib.CONST.SPELL.holyShock),
+        shieldOfRighteousness = GMR.IsSpellKnown(amstlib.CONST.SPELL.shieldOfRighteousness),
     }
 
     amstlib.CONST.BUFF = {
@@ -279,6 +293,8 @@ local isSuccess, err = pcall(function()
         sealOfLight = GetSpellInfo(20165),
         sealOfWisdom = GetSpellInfo(20166),
         sealOfCommand = GetSpellInfo(20375),
+        sealOfCorruption = GetSpellInfo(348704),
+        sealOfVengeance = GetSpellInfo(31801),
         greaterBlessingOfMight = GetSpellInfo(25916),
         greaterBlessingOfKings = GetSpellInfo(25898),
         battleShout = GetSpellInfo(2048),
@@ -288,6 +304,7 @@ local isSuccess, err = pcall(function()
         crusaderAura = GetSpellInfo(32223),
         shadowResistanceAura = GetSpellInfo(27151),
         frostResistanceAura = GetSpellInfo(19898),
+        fireResistanceAura = GetSpellInfo(27153),
         metamorphosis = GetSpellInfo(162264),
         grandMelee = GetSpellInfo(193358),
         broadside = GetSpellInfo(193356),
@@ -306,6 +323,8 @@ local isSuccess, err = pcall(function()
         killingMachine = GetSpellInfo(51124),
         freezingFog = GetSpellInfo(59052),
         bloodTap = GetSpellInfo(45529),
+        infusionOfLight = GetSpellInfo(54149),
+        blessingOfWisdom = GetSpellInfo(27142),
     }
 
     amstlib.CONST.DEBUFF = {
@@ -316,6 +335,74 @@ local isSuccess, err = pcall(function()
         moonfire = GetSpellInfo(164812),
         bloodPlague = GetSpellInfo(55078), -- plagues strike's debuff
         frostFever = GetSpellInfo(55095), -- icy touch's debuff
+        hammerOfJustice = GetSpellInfo(10308),
+        wintersChill = GetSpellInfo(12579),
+        improvedScorch = GetSpellInfo(22959),
+        livingBomb = GetSpellInfo(44457),
+        corruption = GetSpellInfo(27216),
+        ignite = GetSpellInfo(12654),
+        frostFever = GetSpellInfo(55095),
+        frostbite = GetSpellInfo(12494),
+        righteousVengeance = GetSpellInfo(61840),
+        chainsOfIce = GetSpellInfo(45524),
+        seedOfCorruption = GetSpellInfo(27243),
+        strangulate = GetSpellInfo(47476),
+        infectedWounds = GetSpellInfo(58181),
+        coneOfCold = GetSpellInfo(27087),
+        flameShock = GetSpellInfo(25457),
+        moonfire = GetSpellInfo(26988),
+        holyVengeance = GetSpellInfo(31803),
+        thunderclap = GetSpellInfo(15588),
+        woundPoison5 = GetSpellInfo(27189),
+        shatteredBarrier = GetSpellInfo(55080),
+        judgementOfLight = GetSpellInfo(20185),
+        shadowWordPain = GetSpellInfo(25367),
+        silencedShieldOfTheTemplar = GetSpellInfo(63529),
+        psychicScream = GetSpellInfo(10890),
+        bloodPlague = GetSpellInfo(55078),
+        huntersMark = GetSpellInfo(14325),
+        vampiricTouch = GetSpellInfo(34917),
+        frostNova = GetSpellInfo(27088),
+        judgementOfJustice = GetSpellInfo(20184),
+        vindication = GetSpellInfo(26017),
+        chilled = GetSpellInfo(7321),
+        devouringPlague = GetSpellInfo(25467),
+        insectSwarm = GetSpellInfo(27013),
+        repentance = GetSpellInfo(20066),
+        frostbolt = GetSpellInfo(38697),
+        serpentSting = GetSpellInfo(27016),
+        earthAndMoon = GetSpellInfo(60433),
+        shadowfury = GetSpellInfo(30414),
+        immolate = GetSpellInfo(27215),
+        viperSting = GetSpellInfo(3034),
+        unstableAffliction = GetSpellInfo(31117),
+        haunt = GetSpellInfo(59161),
+        ebonPlague = GetSpellInfo(51735),
+        deathCoil = GetSpellInfo(27223),
+        judgementOfWisdom = GetSpellInfo(20186),
+        deadlyPoison = GetSpellInfo(34655),
+        silencingShot = GetSpellInfo(34490),
+        psychicHorror = GetSpellInfo(64044),
+        deadlyPoison7 = GetSpellInfo(27187),
+        avengersShield = GetSpellInfo(32700),
+        mindTrauma = GetSpellInfo(48301),
+        shadowMastery = GetSpellInfo(17800),
+        shadowEmbrace = GetSpellInfo(32391),
+        earthbind = GetSpellInfo(3600),
+        dragonsBreath = GetSpellInfo(33043),
+        cripplingPoison = GetSpellInfo(3409),
+        spellLock = GetSpellInfo(24259),
+        faerieFire = GetSpellInfo(770),
+        envelopingWeb = GetSpellInfo(15471),
+        aftermath = GetSpellInfo(18118),
+        entrapment = GetSpellInfo(19185),
+        cryptFever = GetSpellInfo(50509),
+        blackArrow = GetSpellInfo(63670),
+        faerieFireFeral = GetSpellInfo(16857),
+        forbearance = GetSpellInfo(25771),
+        freezingTrapEffect = GetSpellInfo(14309),
+        markOfBlood = GetSpellInfo(49005),
+        freeze = GetSpellInfo(33395),
     }
 
     amstlib.CONST.GLYPH = {
@@ -443,8 +530,10 @@ local isSuccess, err = pcall(function()
         return self.config
     end
 
+    ---@param link string URL to load
+    ---@param callback fun():void function to call after exec link's content
     ---@return boolean, string result and details
-    function AmstLibCombatRotation:load(link)
+    function AmstLibCombatRotation:load(link, callback)
         if not self.isPrepared then
             error("rotation not prepared, should call prepare() func first")
             return
@@ -456,6 +545,7 @@ local isSuccess, err = pcall(function()
                 Method = "Get",
                 Callback = function(content)
                     RunScript(content)
+                    callback()
                 end
             })
         else
@@ -465,9 +555,8 @@ local isSuccess, err = pcall(function()
 
     ---@param version string
     ---@param checkFunc fun():boolean
-    ---@param rotationCreateFunc fun():void
-    ---@param callAfterLaunch fun():void
-    function AmstLibCombatRotation:initialize(version, checkFunc, rotationCreateFunc, callAfterLaunch)
+    ---@param rotationCreateFunc fun():fun(),fun() function create of rotation's executer and after launch utility functions
+    function AmstLibCombatRotation:initialize(version, checkFunc, rotationCreateFunc)
         if not version then
             error("version is empty")
         end
@@ -488,7 +577,7 @@ local isSuccess, err = pcall(function()
         self.isInitialized = true
 
         self:print("Rotation would be initialized")
-        local rotation = rotationCreateFunc()
+        local rotation, callAfterLaunch = rotationCreateFunc()
         local executeRotationFunc = function()
             local isSuccess, err = pcall(rotation)
             if not isSuccess then
