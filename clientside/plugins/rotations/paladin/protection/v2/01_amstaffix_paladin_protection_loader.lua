@@ -51,7 +51,7 @@ local Config = {
     defaultSealDoNotSwitchList = { 6 }, -- 1:Seal of Righteousness; 2:Seal of Justice; 3:Seal of Light; 4:Seal of Wisdom; 5:Seal of Command; 6:Seal of Corruption;
 
     useCrusaderAuraWhileMounted = true,
-    useCrusaderAuraWhileMounterMinDistance = 50,
+    useCrusaderAuraWhileMounterMinDistance = -1,
 
     useBlessingOfFreedom = true,
 

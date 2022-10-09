@@ -262,37 +262,6 @@ local ok, err = pcall(function()
         return tbl
     end
 
-    ---@class PaladinProtectionV2AuraSettings
-    local AuraSettings = {
-        cfgIndex = 0,
-        spell = "",
-        spellKnown = "",
-        buff = "",
-    }
-
-    ---@return PaladinProtectionV2AuraSettings
-    function AuraSettings:new(cfgIndex, spell, spellKnown, buff)
-        local o = {
-            cfgIndex = cfgIndex,
-            spell = spell,
-            spellKnown = spellKnown,
-            buff = buff,
-        }
-        setmetatable(o, self)
-        self.__index = self
-        return o
-    end
-
-    ---@type table<number, PaladinProtectionV2AuraSettings>
-    local cfgIndexToAuraSettingsMap = {
-        [1] = AuraSettings:new(1, amstlib.CONST.SPELL.devotionAura, amstlib.CONST.SPELL_KNOWN.devotionAura, amstlib.CONST.BUFF.devotionAura),
-        [2] = AuraSettings:new(2, amstlib.CONST.SPELL.retributionAura, amstlib.CONST.SPELL_KNOWN.retributionAura, amstlib.CONST.BUFF.retributionAura),
-        [3] = AuraSettings:new(3, amstlib.CONST.SPELL.concentrationAura, amstlib.CONST.SPELL_KNOWN.concentrationAura, amstlib.CONST.BUFF.concentrationAura),
-        [4] = AuraSettings:new(4, amstlib.CONST.SPELL.shadowResistanceAura, amstlib.CONST.SPELL_KNOWN.shadowResistanceAura, amstlib.CONST.BUFF.shadowResistanceAura),
-        [5] = AuraSettings:new(5, amstlib.CONST.SPELL.frostResistanceAura, amstlib.CONST.SPELL_KNOWN.frostResistanceAura, amstlib.CONST.BUFF.frostResistanceAura),
-        [6] = AuraSettings:new(6, amstlib.CONST.SPELL.fireResistanceAura, amstlib.CONST.SPELL_KNOWN.fireResistanceAura, amstlib.CONST.BUFF.fireResistanceAura)
-    }
-
     ---@class PaladinProtectionV2State
     local State = {
         judgmentToUse = amstlib.CONST.SPELL.judgementOfLight,
@@ -333,8 +302,8 @@ local ok, err = pcall(function()
             self.judgmentToUseDebuff = amstlib.CONST.DEBUFF.judgementOfJustice
         end
 
-        if cfgIndexToAuraSettingsMap[cfg.defaultAuraToUse] and cfgIndexToAuraSettingsMap[cfg.defaultAuraToUse].spellKnown then
-            self.defaultAura = cfgIndexToAuraSettingsMap[cfg.defaultAuraToUse].spell
+        if AmstLibPaladinCommonAuraSettingsMap[cfg.defaultAuraToUse] and AmstLibPaladinCommonAuraSettingsMap[cfg.defaultAuraToUse].spellKnown then
+            self.defaultAura = AmstLibPaladinCommonAuraSettingsMap[cfg.defaultAuraToUse].spell
         end
 
         if cfg.defaultBlessingToUse == 2 and amstlib.CONST.SPELL_KNOWN.blessingOfKings then
@@ -369,19 +338,23 @@ local ok, err = pcall(function()
         cr = nil,
         ---@type AmstLibTrinketer
         trinketer = nil,
+        ---@type AmstLibPaladinCommonAuraChanger
+        auraChanger = nil,
     }
     ---@param cfg PaladinProtectionV2Config
     ---@param state PaladinProtectionV2State
     ---@param cr AmstLibCombatRotation
     ---@param trinketer AmstLibTrinketer
+    ---@param auraChanger AmstLibPaladinCommonAuraChanger
     ---@return PaladinProtectionV2Rotation
-    function Rotation:new(cfg, state, cr, trinketer)
+    function Rotation:new(cfg, state, cr, trinketer, auraChanger)
         ---@type PaladinProtectionV2Rotation
         local o = {
             cfg = cfg,
             state = state,
             cr = cr,
             trinketer = trinketer,
+            auraChanger = auraChanger,
         }
         setmetatable(o, self)
         self.__index = self
@@ -719,94 +692,6 @@ local ok, err = pcall(function()
         return false
     end
 
-    ---@return boolean is casted anything
-    function Rotation:executeAuraChange()
-        if self.cfg.useCrusaderAuraWhileMounted and amstlib.CONST.SPELL_KNOWN.crusaderAura and IsMounted("player") then
-            if not GMR.HasBuff("player", amstlib.CONST.SPELL.crusaderAura)
-                and GMR.GetDestinationDistance() > self.cfg.useCrusaderAuraWhileMounterMinDistance
-                and GMR.IsCastable(amstlib.CONST.SPELL.crusaderAura, "player")
-            then
-                self.cr:printDbg("should change aura to crusader")
-                GMR.Cast(amstlib.CONST.SPELL.crusaderAura, "player")
-                return true
-            end
-
-            -- should do nothing while mounted
-            return false
-        end
-
-        if not GMR.HasBuff("player", self.state.defaultAura) and GMR.IsCastable(self.state.defaultAura, "player") then
-            self.cr:printDbg("should change aura to default '" .. self.state.defaultAura .. "'")
-            GMR.Cast(self.state.defaultAura, "player")
-            return true
-        end
-
-        if not GMR.HasBuff("player", self.state.defaultAura, true) then
-            for _, cfgIndex in ipairs(self.cfg.defaultAuraChangeIfAlreadyExist) do
-                local auraSettings = cfgIndexToAuraSettingsMap[cfgIndex]
-                if auraSettings and auraSettings.spellKnown then
-                    if GMR.HasBuff("player", auraSettings.buff) then
-                        if GMR.HasBuff("player", auraSettings.buff, true) then
-                            -- it's mine aura, no check further
-                            break
-                        end
-                    else
-                        self.cr:printDbg("should cast alternative aura with index #" .. tostring(cfgIndex) .. ", '" .. auraSettings.spell .. "'")
-                        GMR.Cast(auraSettings.spell, "player")
-                        return true
-                    end
-                end
-            end
-        end
-
-        return false
-    end
-
-    ---@param cfg PaladinProtectionV2Config
-    ---@param cr AmstLibCombatRotation
-    ---@return boolean is casted anything
-    local function executeAuraChange(cr, cfg, state)
-        if cfg.useCrusaderAuraWhileMounted and amstlib.CONST.SPELL_KNOWN.crusaderAura and IsMounted("player") then
-            if not GMR.HasBuff("player", amstlib.CONST.SPELL.crusaderAura)
-                and GMR.GetDestinationDistance() > cfg.useCrusaderAuraWhileMounterMinDistance
-                and GMR.IsCastable(amstlib.CONST.SPELL.crusaderAura, "player")
-            then
-                cr:printDbg("should change aura to crusader")
-                GMR.Cast(amstlib.CONST.SPELL.crusaderAura, "player")
-                return true
-            end
-
-            -- should do nothing while mounted
-            return false
-        end
-
-        if not GMR.HasBuff("player", self.state.defaultAura) and GMR.IsCastable(self.state.defaultAura, "player") then
-            self.cr:printDbg("should change aura to default '" .. self.state.defaultAura .. "'")
-            GMR.Cast(self.state.defaultAura, "player")
-            return true
-        end
-
-        if not GMR.HasBuff("player", self.state.defaultAura, true) then
-            for _, cfgIndex in ipairs(self.cfg.defaultAuraChangeIfAlreadyExist) do
-                local auraSettings = cfgIndexToAuraSettingsMap[cfgIndex]
-                if auraSettings and auraSettings.spellKnown then
-                    if GMR.HasBuff("player", auraSettings.buff) then
-                        if GMR.HasBuff("player", auraSettings.buff, true) then
-                            -- it's mine aura, no check further
-                            break
-                        end
-                    else
-                        self.cr:printDbg("should cast alternative aura with index #" .. tostring(cfgIndex) .. ", '" .. auraSettings.spell .. "'")
-                        GMR.Cast(auraSettings.spell, "player")
-                        return true
-                    end
-                end
-            end
-        end
-
-        return false
-    end
-
     ---@return void
     function Rotation:execute()
         if self:isStunned() then
@@ -819,7 +704,7 @@ local ok, err = pcall(function()
             return
         end
 
-        if self:executeAuraChange() then
+        if self.auraChanger:execute() then
             return
         end
 
@@ -1034,13 +919,17 @@ local ok, err = pcall(function()
                         local trinketer = AmstLibTrinketer:new(cr)
                         --trinketer:initialize(amstlib.CONST.SPELL.chainsOfIce) TODO: determine proper spell to gcd check, of find another way
 
-                        local rotation = Rotation:new(cfg, state, cr, trinketer)
+                        local auraChanger = AmstLibPaladinCommonAuraChanger:new(cr, cfg.useCrusaderAuraWhileMounted,
+                            cfg.useCrusaderAuraWhileMounterMinDistance,
+                            state.defaultAura,
+                            cfg.defaultAuraChangeIfAlreadyExist)
+                        local rotation = Rotation:new(cfg, state, cr, trinketer, auraChanger)
                         return function()
                             rotation:execute()
                         end,
                         function()
                             C_Timer.NewTicker(0.5, function()
-                                rotation:executeAuraChange()
+                                auraChanger:execute()
                             end)
                         end
                     end
