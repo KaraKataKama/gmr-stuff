@@ -61,11 +61,6 @@ local Config = {
     useDivineProtectionMinHP = 70,
     useHandOfProtectionMinHP = 40,
 
-    healModEnabled = false,
-    healModHolyLightHealAmount = 3200,
-    healModFlashOfLightHealAmount = 820,
-    healModHolyShockHealAmount = 1800,
-
     useTrinket1 = false,
     useTrinket1Type = 1, -- 1:self-buff, 2:target-harmful, 3:aoe-harmful
 

@@ -153,11 +153,6 @@ local ok, err = pcall(function()
         useDivineProtectionMinHP = 70,
         useHandOfProtectionMinHP = 40,
 
-        healModEnabled = false,
-        healModHolyLightHealAmount = 3200,
-        healModFlashOfLightHealAmount = 820,
-        healModHolyShockHealAmount = 1800,
-
         useTrinket1 = false,
         useTrinket1Type = 1, -- 1:self-buff, 2:target-harmful, 3:aoe-harmful
 
@@ -606,92 +601,6 @@ local ok, err = pcall(function()
         return false
     end
 
-    ---@return boolean did cast something
-    function Rotation:executeHeal()
-        if not self.cfg.healModEnabled then
-            return false
-        end
-
-        if not UnitInRaid("player") and not UnitInParty("player") then
-            return false
-        end
-
-        if self:heal("player") then
-            return true
-        end
-
-        if UnitHealth("focus") > 0 then
-            if self:heal("focus") then
-                return true
-            end
-        end
-
-        if GMR.GetMana("player") < 20 then
-            return false
-        end
-
-        if UnitInRaid("player") then
-            for raidIndex = 1, 40 do
-                local unit = "raid" .. tostring(raidIndex)
-                if self:heal(unit) then
-                    return true
-                end
-            end
-        elseif UnitInParty("player") then
-            for partyIndex = 1, 4 do
-                local unit = "party" .. tostring(partyIndex)
-                if self:heal(unit) then
-                    return true
-                end
-            end
-        end
-
-        return false
-    end
-
-    ---@param unit string|userdata
-    ---@return boolean
-    function Rotation:heal(unit)
-        if GMR.GetDistance("player", unit, ">", 40) then
-            return false
-        end
-        if not GMR.IsAlive(unit) then
-            return false
-        end
-
-        local missingHealth = GMR.UnitHealthMax(unit) - GMR.UnitHealth(unit)
-        if GMR.IsMoving() then
-            if missingHealth >= self.cfg.healModHolyShockHealAmount and GMR.IsCastable(amstlib.CONST.SPELL.holyShock, unit) then
-                self.cr:printDbg("should cast holy shock on '" .. unit .. "' to heal while moving")
-                GMR.Cast(amstlib.CONST.SPELL.holyShock, unit)
-                return true
-            elseif missingHealth >= (self.cfg.healModFlashOfLightHealAmount * 1.5) -- crit 100%
-                and GMR.HasBuff("player", amstlib.CONST.BUFF.infusionOfLight)
-                and GMR.IsCastable(amstlib.CONST.SPELL.flashOfLight, unit)
-            then
-                self.cr:printDbg("should cast flash of light on " .. unit .. " to heal with 'infusion of light' buff while moving")
-                GMR.Cast(amstlib.CONST.SPELL.flashOfLight, unit)
-                return true
-            end
-        else
-            if missingHealth >= self.cfg.healModHolyLightHealAmount and GMR.IsCastable(amstlib.CONST.SPELL.holyLight, unit) then
-                self.cr:printDbg("should cast holy light on " .. unit .. " while standing")
-                GMR.Cast(amstlib.CONST.SPELL.holyLight, unit)
-                return true
-            elseif missingHealth >= self.cfg.healModHolyShockHealAmount and GMR.IsCastable(amstlib.CONST.SPELL.holyShock, unit) then
-                self.cr:printDbg("should cast holy shock on " .. unit .. " while standing")
-                GMR.Cast(amstlib.CONST.SPELL.holyShock, unit)
-                return true
-            elseif missingHealth >= self.cfg.healModFlashOfLightHealAmount and GMR.IsCastable(amstlib.CONST.SPELL.flashOfLight, unit) then
-                self.cr:printDbg("should cast flash of light on " .. unit .. " while standing")
-                GMR.Cast(amstlib.CONST.SPELL.flashOfLight, unit)
-                return true
-            end
-        end
-
-        return false
-    end
-
     ---@return void
     function Rotation:execute()
         if self:isStunned() then
@@ -830,10 +739,6 @@ local ok, err = pcall(function()
         end
 
         if self:executeGroupCleanse() then
-            return
-        end
-
-        if self:executeHeal() then
             return
         end
 
