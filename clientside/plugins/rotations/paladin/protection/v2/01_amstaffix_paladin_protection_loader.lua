@@ -22,44 +22,36 @@ local ROTATION_LINK = "TODO"
 local Config = {
     ---Toggle debug mode. Turn on, if you encounter some issues and want to deal with it, or record a video and send
     ---to author.
-    debug = true,
+    debug = false,
     ---Use standard CombatRotation pluggable function. Change only if you know what you are doing.
     useCombatRotationLauncher = true,
     ---Use online loading feature to get last updates
-    onlineLoad = false,
-
-    consumeArtOfWarFlashLightMinHp = 80,
-    consumeArtOfWarFlashLightIfAuraDepletedSoon = true,
+    onlineLoad = true,
 
     useConsecrations = true,
-    useConsecrationsMinEnemies = 2,
-    useDivineStormMinEnemies = 2,
+    useConsecrationsMinEnemies = 1,
 
     groupCleanseModEnabled = false,
     useJudgmentType = 1, -- 1:Judgement of Light; 2:Judgement of Wisdom; 3:Judgement of Justice;
     useJudgmentTryToCleave = true,
     useJudgmentForDebuffOnly = false,
-    useJudgmentCooldown = 10,
 
     useHandOfReckoningToMakeDamage = true,
-    useHandOfReckoningInInstance = false,
+    useHandOfReckoningInInstance = true,
 
-    defaultAuraToUse = 2, -- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Shadow Resistance Aura; 5:Frost Resistance Aura; 6:Fire Resistance Aura
-    defaultAuraChangeIfAlreadyExist = { 1, 3 }, -- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Shadow Resistance Aura; 5:Frost Resistance Aura; 6:Fire Resistance Aura
-    defaultBlessingToUse = 1, -- 1:Blessing of Might; 2:Blessing of Kings; 3:Blessing of Wisdom
-    defaultSealToUse = 1, -- 1:Seal of Righteousness; 2:Seal of Justice; 3:Seal of Light; 4:Seal of Wisdom; 5:Seal of Command; 6:Seal of Corruption;
+    defaultAuraToUse = 1, -- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Shadow Resistance Aura; 5:Frost Resistance Aura; 6:Fire Resistance Aura
+    defaultAuraChangeIfAlreadyExist = { 2, 3 }, -- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Shadow Resistance Aura; 5:Frost Resistance Aura; 6:Fire Resistance Aura
+    defaultBlessingToUse = 4, -- 1:Blessing of Might; 2:Blessing of Kings; 3:Blessing of Wisdom; 4:Blessing of Sanctuary;
+    defaultSealToUse = 4, -- 1:Seal of Righteousness; 2:Seal of Justice; 3:Seal of Light; 4:Seal of Wisdom; 5:Seal of Command; 6:Seal of Corruption;
     defaultSealDoNotSwitchList = { 6 }, -- 1:Seal of Righteousness; 2:Seal of Justice; 3:Seal of Light; 4:Seal of Wisdom; 5:Seal of Command; 6:Seal of Corruption;
 
     useCrusaderAuraWhileMounted = true,
-    useCrusaderAuraWhileMounterMinDistance = -1,
+    useCrusaderAuraWhileMounterMinDistance = 50,
 
     useBlessingOfFreedom = true,
 
-    groupBuffModEnabled = false,
+    groupBuffModEnabled = true,
     groupBuffModMinMana = 70,
-
-    useDivineProtectionMinHP = 70,
-    useHandOfProtectionMinHP = 40,
 
     useTrinket1 = false,
     useTrinket1Type = 1, -- 1:self-buff, 2:target-harmful, 3:aoe-harmful

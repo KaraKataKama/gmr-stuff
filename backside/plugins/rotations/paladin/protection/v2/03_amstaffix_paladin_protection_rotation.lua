@@ -120,26 +120,21 @@ local ok, err = pcall(function()
         ---Use online loading feature to get last updates
         onlineLoad = true,
 
-        consumeArtOfWarFlashLightMinHp = 80,
-        consumeArtOfWarFlashLightIfAuraDepletedSoon = true,
-
         useConsecrations = true,
-        useConsecrationsMinEnemies = 2,
-        useDivineStormMinEnemies = 2,
+        useConsecrationsMinEnemies = 1,
 
         groupCleanseModEnabled = false,
         useJudgmentType = 1, -- 1:Judgement of Light; 2:Judgement of Wisdom; 3:Judgement of Justice;
         useJudgmentTryToCleave = true,
         useJudgmentForDebuffOnly = false,
-        useJudgmentCooldown = 10,
 
         useHandOfReckoningToMakeDamage = true,
         useHandOfReckoningInInstance = false,
 
-        defaultAuraToUse = 2, -- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Shadow Resistance Aura; 5:Frost Resistance Aura; 6:Fire Resistance Aura
-        defaultAuraChangeIfAlreadyExist = { 1, 3 }, -- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Shadow Resistance Aura; 5:Frost Resistance Aura; 6:Fire Resistance Aura
-        defaultBlessingToUse = 1, -- 1:Blessing of Might; 2:Blessing of Kings; 3:Blessing of Wisdom
-        defaultSealToUse = 1, -- 1:Seal of Righteousness; 2:Seal of Justice; 3:Seal of Light; 4:Seal of Wisdom; 5:Seal of Command; 6:Seal of Corruption;
+        defaultAuraToUse = 1, -- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Shadow Resistance Aura; 5:Frost Resistance Aura; 6:Fire Resistance Aura
+        defaultAuraChangeIfAlreadyExist = { 2, 3 }, -- 1:Devotion Aura; 2:Retribution Aura; 3:Concentration Aura; 4:Shadow Resistance Aura; 5:Frost Resistance Aura; 6:Fire Resistance Aura
+        defaultBlessingToUse = 4, -- 1:Blessing of Might; 2:Blessing of Kings; 3:Blessing of Wisdom; 4:Blessing of Sanctuary;
+        defaultSealToUse = 4, -- 1:Seal of Righteousness; 2:Seal of Justice; 3:Seal of Light; 4:Seal of Wisdom; 5:Seal of Command; 6:Seal of Corruption;
         defaultSealDoNotSwitchList = { 6 }, -- 1:Seal of Righteousness; 2:Seal of Justice; 3:Seal of Light; 4:Seal of Wisdom; 5:Seal of Command; 6:Seal of Corruption;
 
         useCrusaderAuraWhileMounted = true,
@@ -147,12 +142,10 @@ local ok, err = pcall(function()
 
         useBlessingOfFreedom = true,
 
-        groupBuffModEnabled = false,
+        groupBuffModEnabled = true,
         groupBuffModMinMana = 70,
 
-        useDivineProtectionMinHP = 70,
-        useHandOfProtectionMinHP = 40,
-
+        useAggroSpellsInGroup = true,
         useTrinket1 = false,
         useTrinket1Type = 1, -- 1:self-buff, 2:target-harmful, 3:aoe-harmful
 
@@ -272,7 +265,9 @@ local ok, err = pcall(function()
         ---@type PaladinProtectionV2SealSettings
         defaultSeal = PaladinSealSettings:new(0, "", false, ""),
         ---@type PaladinProtectionV2SealSettings[]
-        ignoredSeals = {}
+        ignoredSeals = {},
+
+        judgmentCooldown = 10,
     }
 
     function State:new()
@@ -309,6 +304,10 @@ local ok, err = pcall(function()
             self.defaultBlessingSpell = amstlib.CONST.SPELL.blessingOfWisdom
             self.defaultBlessingKnown = amstlib.CONST.SPELL_KNOWN.blessingOfWisdom
             self.defaultBlessingBuff = amstlib.CONST.BUFF.blessingOfWisdom
+        elseif cfg.defaultBlessingToUse == 4 and amstlib.CONST.SPELL_KNOWN.blessingOfSanctuary then
+            self.defaultBlessingSpell = amstlib.CONST.SPELL.blessingOfSanctuary
+            self.defaultBlessingKnown = amstlib.CONST.SPELL_KNOWN.blessingOfSanctuary
+            self.defaultBlessingBuff = amstlib.CONST.BUFF.blessingOfSanctuary
         end
 
         local cfgIndexToSealSettingsMap = compileCfgIndexToSealSettingsMap()
@@ -321,6 +320,8 @@ local ok, err = pcall(function()
                 table.insert(self.ignoredSeals, cfgIndexToSealSettingsMap[sealCfgIndex])
             end
         end
+
+        self.judgmentCooldown = AmstLibPaladinCommon.CalculateJudgementCdDuration()
     end
 
     ---@class PaladinProtectionV2Rotation
@@ -621,22 +622,25 @@ local ok, err = pcall(function()
             return
         end
 
-        if not GMR.HasDebuff("player", amstlib.CONST.DEBUFF.forbearance) then
-            if amstlib.CONST.SPELL_KNOWN.handOfProtection and GMR.GetHealth("player") < self.cfg.useHandOfProtectionMinHP
-                and GMR.IsCastable(amstlib.CONST.SPELL.handOfProtection, "player")
-            then
-                self.cr:printDbg("should cast hand of protection on player")
-                GMR.Cast(amstlib.CONST.SPELL.handOfProtection, "player")
-                return
-            end
+        local isTargetAttackable = GMR.IsAlive("target") and GMR.UnitCanAttack("player", "target")
+            and not GMR.IsImmune("target")
 
-            if amstlib.CONST.SPELL_KNOWN.divineProtection and GMR.GetHealth("player") < self.cfg.useDivineProtectionMinHP
-                and GMR.IsCastable(amstlib.CONST.SPELL.divineProtection, "player")
-            then
-                self.cr:printDbg("should cast divine protection on player")
-                GMR.Cast(amstlib.CONST.SPELL.divineProtection, "player")
-                return
-            end
+        if not GMR.HasBuff("player", amstlib.CONST.BUFF.righteousFury) and amstlib.CONST.SPELL_KNOWN.righteousFury
+            and GMR.IsCastable(amstlib.CONST.SPELL.righteousFury, "player")
+        then
+            self.cr:printDbg("should cast righteous fury on player to gain tank buff")
+            GMR.Cast(amstlib.CONST.SPELL.righteousFury, "player")
+            return
+        end
+
+        if isTargetAttackable and amstlib.CONST.SPELL_KNOWN.divinePlea
+            and not GMR.HasBuff("player", amstlib.CONST.BUFF.divinePlea)
+            and GMR.GetDistance("player", "target", "<", 10)
+            and GMR.IsCastable(amstlib.CONST.SPELL.divinePlea, "player")
+        then
+            self.cr:printDbg("should cast divine please to get buff")
+            GMR.Cast(amstlib.CONST.SPELL.divinePlea, "player")
+            return
         end
 
         if self.state.defaultBlessingKnown and not HasBuffClassed("player", self.state.defaultBlessingBuff)
@@ -664,14 +668,35 @@ local ok, err = pcall(function()
             end
         end
 
-        local isTargetAttackable = GMR.IsAlive("target") and GMR.UnitCanAttack("player", "target")
-            and not GMR.IsImmune("target")
+        if self.cfg.useAggroSpellsInGroup and UnitInParty("player") then
+            for partyIndex = 1, 4 do
+                local unit = "party" .. tostring(partyIndex)
+                for i = 1, #GMR.Tables.Attackables do
+                    local attackable = GMR.Tables.Attackables[i][1]
+                    if GMR.ObjectExists(attackable) and GMR.IsAlive(attackable) and GMR.UnitLevel(attackable) > 1
+                        and GMR.UnitIsUnit(GMR.UnitTarget(attackable), unit)
+                    then
+                        if amstlib.CONST.SPELL_KNOWN.handOfReckoning and GMR.IsCastable(amstlib.CONST.SPELL.handOfReckoning, attackable)
+                        then
+                            self.cr:printDbg("should cast hand of reckoning on '" .. GMR.UnitName(attackable) .. "' to taunt")
+                            GMR.Cast(amstlib.CONST.SPELL.handOfReckoning, attackable)
+                            return
+                        elseif amstlib.CONST.SPELL_KNOWN.righteousDefense and GMR.IsCastable(amstlib.CONST.SPELL.righteousDefense, unit) then
+                            self.cr:printDbg("should cast righteous defense on '" .. GMR.UnitName(unit) .. "' party member to taunt mobs from")
+                            GMR.Cast(amstlib.CONST.SPELL.righteousDefense, unit)
+                            return
+                        end
+                    end
+                end
+            end
+        end
 
         -- Hammer of Wrath
         if amstlib.CONST.SPELL_KNOWN.hammerOfWrath then
             for i = 1, #GMR.Tables.Attackables do
                 local attackable = GMR.Tables.Attackables[i][1]
                 if GMR.ObjectExists(attackable) and GMR.IsAlive(attackable) and GMR.GetHealth(attackable) < 20
+                    and GMR.UnitLevel(attackable) > 1
                     and GMR.IsCastable(amstlib.CONST.SPELL.hammerOfWrath, attackable)
                 then
                     self.cr:printDbg("should cast hammer of wrath")
@@ -679,6 +704,14 @@ local ok, err = pcall(function()
                     return
                 end
             end
+        end
+
+        if amstlib.CONST.SPELL_KNOWN.holyShield and not GMR.HasBuff("player", amstlib.CONST.BUFF.holyShield)
+            and GMR.IsCastable(amstlib.CONST.SPELL.holyShield, "player")
+        then
+            self.cr:printDbg("should cast holy shield to protect myself'")
+            GMR.Cast(amstlib.CONST.SPELL.holyShield, "player")
+            return
         end
 
         -- Judgement
@@ -693,7 +726,8 @@ local ok, err = pcall(function()
                         if GMR.ObjectExists(attackable) and GMR.IsCastable(self.state.judgmentToUse, attackable)
                             and GMR.GetDistance("player", attackable, "<", 10)
                             and not GMR.IsImmune(attackable)
-                            and GMR.GetDebuffExpiration(attackable, self.state.judgmentToUseDebuff) < self.cfg.useJudgmentCooldown
+                            and GMR.UnitLevel(attackable) > 1
+                            and GMR.GetDebuffExpiration(attackable, self.state.judgmentToUseDebuff) < self.state.judgmentCooldown
                         then
                             unitToCast = attackable
                             break
@@ -711,27 +745,6 @@ local ok, err = pcall(function()
 
         if self:cleanse("player") then
             return
-        end
-
-        if GMR.HasBuff("player", amstlib.CONST.BUFF.theArtOfWar) then
-            if amstlib.CONST.SPELL_KNOWN.flashOfLight and GMR.GetHealth("player") < self.cfg.consumeArtOfWarFlashLightMinHp
-                and GMR.IsCastable(amstlib.CONST.SPELL.flashOfLight, "player")
-            then
-                self.cr:printDbg("should cast flash of light on self to consume the art of war aura")
-                GMR.Cast(amstlib.CONST.SPELL.flashOfLight, "player")
-                return
-            elseif isTargetAttackable and amstlib.CONST.SPELL_KNOWN.exorcism and GMR.IsCastable(amstlib.CONST.SPELL.exorcism, "target") then
-                self.cr:printDbg("should cast exorcism on target to consume the art of war aura")
-                GMR.Cast(amstlib.CONST.SPELL.exorcism, "target")
-                return
-            elseif self.cfg.consumeArtOfWarFlashLightIfAuraDepletedSoon and amstlib.CONST.SPELL_KNOWN.flashOfLight
-                and GMR.GetBuffExpiration("player", amstlib.CONST.BUFF.theArtOfWar) < 2
-                and GMR.GetHealth("player") < 100 and GMR.IsCastable(amstlib.CONST.SPELL.flashOfLight, "player")
-            then
-                self.cr:printDbg("should cast flash of light on self to consume the art of war aura. Aura will deplete soon.")
-                GMR.Cast(amstlib.CONST.SPELL.flashOfLight, "player")
-                return
-            end
         end
 
         if self:applyBlessingOfFreedom("player") then
@@ -752,32 +765,28 @@ local ok, err = pcall(function()
             return
         end
 
+        if isTargetAttackable and amstlib.CONST.SPELL_KNOWN.hammerOfTheRighteous
+            and GMR.IsCastable(amstlib.CONST.SPELL.hammerOfTheRighteous, "target")
+        then
+            self.cr:printDbg("should cast hammer of the righteous")
+            GMR.Cast(amstlib.CONST.SPELL.hammerOfTheRighteous, "target")
+            return
+        end
+
+        if isTargetAttackable and amstlib.CONST.SPELL_KNOWN.shieldOfRighteousness
+            and GMR.IsCastable(amstlib.CONST.SPELL.shieldOfRighteousness, "target")
+        then
+            self.cr:printDbg("should cast shield of righteousness")
+            GMR.Cast(amstlib.CONST.SPELL.shieldOfRighteousness, "target")
+            return
+        end
+
         if self.cfg.useConsecrations and amstlib.CONST.SPELL_KNOWN.consecrations and not GMR.IsMoving()
             and GMR.GetNumEnemies("player", 10) >= self.cfg.useConsecrationsMinEnemies
             and GMR.IsCastable(amstlib.CONST.SPELL.consecrations, "player")
         then
             self.cr:printDbg("should use consecrations")
             GMR.Cast(amstlib.CONST.SPELL.consecrations, "player")
-            return
-        end
-
-        if amstlib.CONST.SPELL_KNOWN.divineStorm and GMR.GetNumEnemies("player", 8) >= self.cfg.useDivineStormMinEnemies
-            and GMR.IsCastable(amstlib.CONST.SPELL.divineStorm, "player")
-        then
-            self.cr:printDbg("should use divine storm")
-            GMR.Cast(amstlib.CONST.SPELL.divineStorm, "player")
-            return
-        end
-
-        if isTargetAttackable and amstlib.CONST.SPELL_KNOWN.crusaderStrike and GMR.IsCastable(amstlib.CONST.SPELL.crusaderStrike, "target") then
-            self.cr:printDbg("should cast crusader strike")
-            GMR.Cast(amstlib.CONST.SPELL.crusaderStrike, "target")
-            return
-        end
-
-        if isTargetAttackable and amstlib.CONST.SPELL_KNOWN.shieldOfRighteousness and GMR.IsCastable(amstlib.CONST.SPELL.shieldOfRighteousness, "target") then
-            self.cr:printDbg("should cast shield of righteousness")
-            GMR.Cast(amstlib.CONST.SPELL.shieldOfRighteousness, "target")
             return
         end
 

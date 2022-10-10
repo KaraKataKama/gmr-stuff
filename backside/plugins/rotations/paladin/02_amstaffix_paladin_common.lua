@@ -1,4 +1,9 @@
 local ok, err = pcall(function()
+    AmstLibPaladinCommon = {}
+    function AmstLibPaladinCommon.CalculateJudgementCdDuration()
+        local pointsInImprovedJudgement = select(5, GetTalentInfo(3, 10))
+        return 10 - pointsInImprovedJudgement
+    end
     ---@class AmstLibPaladinCommonAuraSettings
     AmstLibPaladinCommonAuraSettings = {
         cfgIndex = 0,
@@ -211,7 +216,6 @@ local ok, err = pcall(function()
 
         return false
     end
-
 end)
 if not ok then
     GMR.Print("[ERROR] " .. err)
