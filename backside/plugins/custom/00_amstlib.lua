@@ -170,6 +170,12 @@ local isSuccess, err = pcall(function()
         holyLight = GetSpellInfo(25292),
         holyShock = GetSpellInfo(33072),
         shieldOfRighteousness = GetSpellInfo(53600),
+        righteousFury = GetSpellInfo(25780),
+        blessingOfSanctuary = GetSpellInfo(20911),
+        holyShield = GetSpellInfo(20925),
+        hammerOfTheRighteous = GetSpellInfo(53595),
+        divinePlea = GetSpellInfo(54428),
+        righteousDefense =  GetSpellInfo(31789),
     }
 
     amstlib.CONST.SPELL_KNOWN = {
@@ -282,6 +288,12 @@ local isSuccess, err = pcall(function()
         holyLight = GMR.IsSpellKnown(amstlib.CONST.SPELL.holyLight),
         holyShock = GMR.IsSpellKnown(amstlib.CONST.SPELL.holyShock),
         shieldOfRighteousness = GMR.IsSpellKnown(amstlib.CONST.SPELL.shieldOfRighteousness),
+        righteousFury = GMR.IsSpellKnown(amstlib.CONST.SPELL.righteousFury),
+        blessingOfSanctuary = GMR.IsSpellKnown(amstlib.CONST.SPELL.blessingOfSanctuary),
+        holyShield = GMR.IsSpellKnown(amstlib.CONST.SPELL.holyShield),
+        hammerOfTheRighteous = GMR.IsSpellKnown(amstlib.CONST.SPELL.hammerOfTheRighteous),
+        divinePlea = GMR.IsSpellKnown(amstlib.CONST.SPELL.divinePlea),
+        righteousDefense = GMR.IsSpellKnown(amstlib.CONST.SPELL.righteousDefense),
     }
 
     amstlib.CONST.BUFF = {
@@ -325,6 +337,10 @@ local isSuccess, err = pcall(function()
         bloodTap = GetSpellInfo(45529),
         infusionOfLight = GetSpellInfo(54149),
         blessingOfWisdom = GetSpellInfo(27142),
+        righteousFury = GetSpellInfo(25780),
+        blessingOfSanctuary = GetSpellInfo(20911),
+        holyShield = GetSpellInfo(20925),
+        divinePlea = GetSpellInfo(54428),
     }
 
     amstlib.CONST.DEBUFF = {
