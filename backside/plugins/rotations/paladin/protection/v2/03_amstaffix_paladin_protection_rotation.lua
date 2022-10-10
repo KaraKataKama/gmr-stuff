@@ -322,6 +322,7 @@ local ok, err = pcall(function()
         end
 
         self.judgmentCooldown = AmstLibPaladinCommon.CalculateJudgementCdDuration()
+        cr:print("judgment cooldown is " .. tostring(self.judgmentCooldown) .. " sec.")
     end
 
     ---@class PaladinProtectionV2Rotation
@@ -816,8 +817,8 @@ local ok, err = pcall(function()
                 cr:initialize(
                     VERSION,
                     function()
-                        return GMR.GetClass("player") == amstlib.CONST.CLASS.PALADIN
-                        -- and select(5, GetTalentInfo(2, 8)) == 1 TODO: determine proper talents for paladin
+                        local talentTabToCountMap = amstlib.Util.calculateTalentsPerTab()
+                        return GMR.GetClass("player") == amstlib.CONST.CLASS.PALADIN and talentTabToCountMap[2] > 30
                     end,
                     function()
                         local cfg = Config:new(cr)

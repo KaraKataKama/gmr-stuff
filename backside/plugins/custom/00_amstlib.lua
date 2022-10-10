@@ -758,6 +758,20 @@ local isSuccess, err = pcall(function()
         end
     end
 
+    ---Calculates total amount of talents in each tab
+    ---@return table<number, number> table, key is tab index, value is total count of talents in that tab
+    function amstlib.Util.calculateTalentsPerTab()
+        local talents = {}
+        for tabIndex = 1, GetNumTalentTabs() do
+            talents[tabIndex] = 0
+            for talentIndex = 1, GetNumTalents(tabIndex) do
+                talents[tabIndex] = talents[tabIndex] + select(5, GetTalentInfo(tabIndex, talentIndex))
+            end
+        end
+
+        return talents
+    end
+
     GMR.RunEncryptedScript("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")
 
     -- ---------------- --
