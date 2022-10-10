@@ -146,6 +146,7 @@ local ok, err = pcall(function()
         groupBuffModMinMana = 70,
 
         useAggroSpellsInGroup = true,
+
         useTrinket1 = false,
         useTrinket1Type = 1, -- 1:self-buff, 2:target-harmful, 3:aoe-harmful
 
