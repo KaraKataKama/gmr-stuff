@@ -818,8 +818,11 @@ local ok, err = pcall(function()
                 cr:initialize(
                     VERSION,
                     function()
-                        local talentTabToCountMap = amstlib.Util.calculateTalentsPerTab()
-                        return GMR.GetClass("player") == amstlib.CONST.CLASS.PALADIN and talentTabToCountMap[2] > 30
+                        if GMR.GetClass("player") ~= amstlib.CONST.CLASS.PALADIN then
+                            return false
+                        end
+
+                        return amstlib.Util.getDeepestTalentTab() == 2
                     end,
                     function()
                         local cfg = Config:new(cr)
