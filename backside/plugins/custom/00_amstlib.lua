@@ -176,6 +176,7 @@ local isSuccess, err = pcall(function()
         hammerOfTheRighteous = GetSpellInfo(53595),
         divinePlea = GetSpellInfo(54428),
         righteousDefense = GetSpellInfo(31789),
+        beaconOfLight = GetSpellInfo(53563),
     }
 
     amstlib.CONST.SPELL_KNOWN = {
@@ -294,6 +295,7 @@ local isSuccess, err = pcall(function()
         hammerOfTheRighteous = GMR.IsSpellKnown(amstlib.CONST.SPELL.hammerOfTheRighteous),
         divinePlea = GMR.IsSpellKnown(amstlib.CONST.SPELL.divinePlea),
         righteousDefense = GMR.IsSpellKnown(amstlib.CONST.SPELL.righteousDefense),
+        beaconOfLight = GMR.IsSpellKnown(amstlib.CONST.SPELL.beaconOfLight),
     }
 
     amstlib.CONST.BUFF = {
@@ -341,6 +343,7 @@ local isSuccess, err = pcall(function()
         blessingOfSanctuary = GetSpellInfo(20911),
         holyShield = GetSpellInfo(20925),
         divinePlea = GetSpellInfo(54428),
+        beaconOfLight = GetSpellInfo(53563),
     }
 
     amstlib.CONST.DEBUFF = {
@@ -780,6 +783,7 @@ local isSuccess, err = pcall(function()
         for tabIndex, count in ipairs(talentsSummary) do
             if count > maxTalentsCount then
                 maxTabIndex = tabIndex
+                maxTalentsCount = count
             end
         end
 
