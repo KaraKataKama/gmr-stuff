@@ -27,6 +27,9 @@ local Config = {
     useCombatRotationLauncher = true,
     ---Use online loading feature to get last updates
     onlineLoad = true,
+    ---Character names to force load that rotation
+    forceLoadForCharacters = {},
+
     ---Min HP to cast Icebound Fortitude
     iceboundFortitudeHpUse = 50,
     bloodBoilEnabled = true,

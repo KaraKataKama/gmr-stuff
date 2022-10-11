@@ -16,7 +16,7 @@
 --along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 local ID = "CR>DK/F"
-local VERSION = "v4.0.1"
+local VERSION = "v4.0.2"
 
 ---@class DeathKnightFrostV4Config
 local Config = {
@@ -27,6 +27,9 @@ local Config = {
     useCombatRotationLauncher = true,
     ---Use online loading feature to get last updates
     onlineLoad = true,
+    ---Character names to force load that rotation
+    forceLoadForCharacters = {},
+
     ---Min HP to cast Icebound Fortitude
     iceboundFortitudeHpUse = 50,
     bloodBoilEnabled = true,
@@ -701,8 +704,18 @@ do
         cr:initialize(
             VERSION,
             function()
-                return GMR.GetClass("player") == amstlib.CONST.CLASS.DEATHKNIGHT
-                    and select(5, GetTalentInfo(2, 8)) == 1
+                if GMR.GetClass("player") ~= amstlib.CONST.CLASS.DEATHKNIGHT then
+                    return false
+                end
+
+                local playerName = GMR.UnitName("player")
+                for _, name in ipairs(cr:getConfig()["forceLoadForCharacters"] or {}) do
+                    if playerName == name then
+                        return true
+                    end
+                end
+
+                return amstlib.Util.getDeepestTalentTab() == 2
             end,
             function()
                 local cfg = Config:new(cr)

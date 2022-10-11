@@ -1,4 +1,7 @@
 # CHANGELOG:
+## v4.0.2
+- added more convenient way to choose proper rotation
+- added possibility to force load rotation to specific nick
 ## v4.0.1
 - moved function to work with debuffs in lib
 ## v4.0.0
