@@ -177,6 +177,12 @@ local isSuccess, err = pcall(function()
         divinePlea = GetSpellInfo(54428),
         righteousDefense = GetSpellInfo(31789),
         beaconOfLight = GetSpellInfo(53563),
+        arcaneBarrage = GetSpellInfo(44425),
+        arcaneMissiles = GetSpellInfo(25345),
+        fireBlast = GetSpellInfo(10199),
+        coneOfCold = GetSpellInfo(10161),
+        fireball = GetSpellInfo(10151),
+        presenceOfMind = GetSpellInfo(12043),
     }
 
     amstlib.CONST.SPELL_KNOWN = {
@@ -296,6 +302,12 @@ local isSuccess, err = pcall(function()
         divinePlea = GMR.IsSpellKnown(amstlib.CONST.SPELL.divinePlea),
         righteousDefense = GMR.IsSpellKnown(amstlib.CONST.SPELL.righteousDefense),
         beaconOfLight = GMR.IsSpellKnown(amstlib.CONST.SPELL.beaconOfLight),
+        arcaneBarrage = GMR.IsSpellKnown(amstlib.CONST.SPELL.arcaneBarrage),
+        arcaneMissiles = GMR.IsSpellKnown(amstlib.CONST.SPELL.arcaneMissiles),
+        fireBlast = GMR.IsSpellKnown(amstlib.CONST.SPELL.fireBlast),
+        coneOfCold = GMR.IsSpellKnown(amstlib.CONST.SPELL.coneOfCold),
+        fireball = GMR.IsSpellKnown(amstlib.CONST.SPELL.fireball),
+        presenceOfMind = GMR.IsSpellKnown(amstlib.CONST.SPELL.presenceOfMind),
     }
 
     amstlib.CONST.BUFF = {
@@ -344,6 +356,8 @@ local isSuccess, err = pcall(function()
         holyShield = GetSpellInfo(20925),
         divinePlea = GetSpellInfo(54428),
         beaconOfLight = GetSpellInfo(53563),
+        missileBarrage = GetSpellInfo(44401),
+        presenceOfMind = GetSpellInfo(12043),
     }
 
     amstlib.CONST.DEBUFF = {
