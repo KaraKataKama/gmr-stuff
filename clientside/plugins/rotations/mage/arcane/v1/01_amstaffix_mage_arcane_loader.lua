@@ -17,7 +17,7 @@
 
 local ID = "CR>M/A"
 local LIB_LINK = "https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/backside/plugins/custom/00_amstlib.lua"
-local ROTATION_LINK = "TODO"
+local ROTATION_LINK = "https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/backside/plugins/rotations/mage/arcane/v1/09_amstaffix_mage_arcane_rotation.lua"
 ---@type MageArcaneV1Config
 local Config = {
     ---Toggle debug mode. Turn on, if you encounter some issues and want to deal with it, or record a video and send

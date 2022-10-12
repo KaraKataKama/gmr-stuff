@@ -8,8 +8,8 @@
 ## Installation
 - delete previous versions!
 - turn off all spells in Spells tab
-- download [TODO](TODO)
-- place downloaded file `TODO` into
+- download [09_amstaffix_mage_arcane_rotation.lua](https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/backside/plugins/rotations/mage/arcane/v1/09_amstaffix_mage_arcane_rotation.lua)
+- place downloaded file `09_amstaffix_mage_arcane_rotation.lua` into
   - HWT: `{HWT_Dir}/addons/Wrath of the Lichking/Plugins/`
   - Tinkr: `{Tinkr_Dir}/scripts/GMR/Plugins/`
 
