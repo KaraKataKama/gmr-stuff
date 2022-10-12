@@ -938,6 +938,42 @@ local isSuccess, err = pcall(function()
 
         return false
     end
+    -- ----------- --
+    -- TTL Storage --
+    -- ----------- --
+
+    ---@class AmstLibTtlStorage
+    AmstLibTtlStorage = {}
+    ---@type table<string, table>
+    AmstLibTtlStorage.data = {}
+
+    function AmstLibTtlStorage:new()
+        ---@type AmstLibTtlStorage
+        local o = {}
+        setmetatable(o, self)
+        self.__index = self
+
+        C_Timer.NewTicker(0.1, function()
+            local curTime = GetTime()
+            local keysToRemove = {}
+            for k, v in pairs(o.data) do
+                if v[2] < curTime then
+                    table.insert(keysToRemove, k)
+                end
+            end
+
+            for _, keyToRemove in ipairs(keysToRemove) do
+                o.data[keyToRemove] = nil
+            end
+        end)
+        return o
+    end
+    function AmstLibTtlStorage:Get(key)
+        return self.data[key][1]
+    end
+    function AmstLibTtlStorage:Set(key, value, ttl)
+        self.data[key] = { value, GetTime() + ttl }
+    end
 end)
 
 if not isSuccess then

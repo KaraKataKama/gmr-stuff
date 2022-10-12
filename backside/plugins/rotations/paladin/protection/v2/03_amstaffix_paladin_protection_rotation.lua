@@ -717,32 +717,39 @@ local ok, err = pcall(function()
         end
 
         -- Judgement
-        if self.state.judgmentToUseKnown and GetSpellCooldown(self.state.judgmentToUse) == 0 and isTargetAttackable then
-            if not self.cfg.useJudgmentForDebuffOnly or (self.cfg.useJudgmentForDebuffOnly
-                and not GMR.HasBuff("target", self.state.judgmentToUseDebuff, true))
-            then
-                local unitToCast = "target"
-                if self.cfg.useJudgmentTryToCleave then
-                    for i = 1, #GMR.Tables.Attackables do
-                        local attackable = GMR.Tables.Attackables[i][1]
-                        if GMR.ObjectExists(attackable) and GMR.IsCastable(self.state.judgmentToUse, attackable)
-                            and GMR.GetDistance("player", attackable, "<", 10)
-                            and not GMR.IsImmune(attackable)
-                            and GMR.UnitLevel(attackable) > 1
-                            and GMR.GetDebuffExpiration(attackable, self.state.judgmentToUseDebuff) < self.state.judgmentCooldown
-                        then
-                            unitToCast = attackable
-                            break
-                        end
-                    end
-                end
+        --if self.state.judgmentToUseKnown and GetSpellCooldown(self.state.judgmentToUse) == 0 and isTargetAttackable then
+        --    if not self.cfg.useJudgmentForDebuffOnly or (self.cfg.useJudgmentForDebuffOnly
+        --        and not GMR.HasBuff("target", self.state.judgmentToUseDebuff, true))
+        --    then
+        --        local unitToCast = "target"
+        --        if not GMR.HasPlayerBuff("tar")
+        --        if self.cfg.useJudgmentTryToCleave then
+        --            for i = 1, #GMR.Tables.Attackables do
+        --                local attackable = GMR.Tables.Attackables[i][1]
+        --                if GMR.ObjectExists(attackable) and GMR.IsCastable(self.state.judgmentToUse, attackable)
+        --                    and GMR.GetDistance("player", attackable, "<", 10)
+        --                    and not GMR.IsImmune(attackable)
+        --                    and GMR.UnitLevel(attackable) > 1
+        --                    and GMR.GetDebuffExpiration(attackable, self.state.judgmentToUseDebuff) < self.state.judgmentCooldown
+        --                then
+        --                    unitToCast = attackable
+        --                    break
+        --                end
+        --            end
+        --        end
+        --
+        --        if unitToCast and GMR.IsCastable(self.state.judgmentToUse, unitToCast) then
+        --            self.cr:printDbg("should cast default judgment '" .. self.state.judgmentToUse .. "'")
+        --            GMR.Cast(self.state.judgmentToUse, unitToCast)
+        --            return
+        --        end
+        --    end
+        --end
 
-                if unitToCast and GMR.IsCastable(self.state.judgmentToUse, unitToCast) then
-                    self.cr:printDbg("should cast default judgment '" .. self.state.judgmentToUse .. "'")
-                    GMR.Cast(self.state.judgmentToUse, unitToCast)
-                    return
-                end
-            end
+        if self.state.judgmentToUseKnown and GMR.IsCastable(self.state.judgmentToUse, "target") then
+            self.cr:printDbg("should cast default judgment '" .. self.state.judgmentToUse .. "' on target")
+            GMR.Cast(self.state.judgmentToUse, "target")
+            return
         end
 
         if self:cleanse("player") then
@@ -831,6 +838,7 @@ local ok, err = pcall(function()
                         local state = State:new()
                         state:determine(cr, cfg)
 
+                        local ttlStorage = AmstLibTtlStorage:new()
                         if cfg.groupCleanseModEnabled and cfg.useCombatRotationLauncher then
                             cr:print("You have turned on `groupCleanseModEnabled`;therefore, you should turn off `useCombatRotationLauncher` to get better results")
                         end

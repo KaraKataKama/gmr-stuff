@@ -647,6 +647,15 @@ local ok, err = pcall(function()
             end
         end
 
+        if amstlib.CONST.SPELL_KNOWN.beaconOfLight and GMR.ObjectExists("focus") and GMR.GetHealth("focus") > 0
+            and not GMR.HasPlayerBuff("focus", amstlib.CONST.BUFF.beaconOfLight)
+            and GMR.IsCastable(amstlib.CONST.SPELL.beaconOfLight, "focus")
+        then
+            self.cr:printDbg("should cast beacon of light on focus(" .. GMR.UnitName("focus") .. ")")
+            GMR.Cast(amstlib.CONST.SPELL.beaconOfLight, "focus")
+            return
+        end
+
         -- Hammer of Wrath
         if amstlib.CONST.SPELL_KNOWN.hammerOfWrath then
             for i = 1, #GMR.Tables.Attackables do
