@@ -15,7 +15,7 @@
 --You should have received a copy of the GNU General Public License
 --along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-local ID = "CR>M/A"
+local ID = "CR>TODO/TODO"
 local LIB_LINK = "TODO"
 local ROTATION_LINK = "TODO"
 ---@type MageArcaneV1Config
