@@ -993,6 +993,10 @@ local isSuccess, err = pcall(function()
         return o
     end
     function AmstLibTtlStorage:Get(key)
+        if not self.data[key] then
+            return nil
+        end
+
         return self.data[key][1]
     end
     function AmstLibTtlStorage:Set(key, value, ttl)
