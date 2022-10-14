@@ -1,4 +1,9 @@
 # CHANGELOG:
+## v2.0.0
+- make separate rotation for protection paladin
+- added all skills usage (72 lvl pala)
+- added some tank logic
+- default config options chosen for tanking in dungeon groups
 ## v1.7.1
 - fixed Seal of Corruption on alliance player issue
 ## v1.7.0
@@ -15,7 +20,7 @@
 - optimized seals usage
 ## v1.4.0
 - added blessing of freedom usage
-- added usage of divine protection 
+- added usage of divine protection
 - added usage hand of protection
 - added smart aura changes
 - added group buffing

@@ -338,14 +338,17 @@ local ok, err = pcall(function()
         trinketer = nil,
         ---@type AmstLibPaladinCommonAuraChanger
         auraChanger = nil,
+        ---@type AmstLibTtlStorage
+        ttlStorage = nil,
     }
     ---@param cfg PaladinProtectionV2Config
     ---@param state PaladinProtectionV2State
     ---@param cr AmstLibCombatRotation
     ---@param trinketer AmstLibTrinketer
     ---@param auraChanger AmstLibPaladinCommonAuraChanger
+    ---@param ttlStorage AmstLibTtlStorage
     ---@return PaladinProtectionV2Rotation
-    function Rotation:new(cfg, state, cr, trinketer, auraChanger)
+    function Rotation:new(cfg, state, cr, trinketer, auraChanger, ttlStorage)
         ---@type PaladinProtectionV2Rotation
         local o = {
             cfg = cfg,
@@ -353,6 +356,7 @@ local ok, err = pcall(function()
             cr = cr,
             trinketer = trinketer,
             auraChanger = auraChanger,
+            ttlStorage = ttlStorage,
         }
         setmetatable(o, self)
         self.__index = self
@@ -670,7 +674,16 @@ local ok, err = pcall(function()
             end
         end
 
-        if self.cfg.useAggroSpellsInGroup and UnitInParty("player") then
+        if self.cfg.useConsecrations and amstlib.CONST.SPELL_KNOWN.consecrations and not GMR.IsMoving()
+            and GMR.GetNumEnemies("player", 10) >= self.cfg.useConsecrationsMinEnemies
+            and GMR.IsCastable(amstlib.CONST.SPELL.consecrations, "player")
+        then
+            self.cr:printDbg("should use consecrations")
+            GMR.Cast(amstlib.CONST.SPELL.consecrations, "player")
+            return
+        end
+
+        if self.cfg.useAggroSpellsInGroup and UnitInParty("player") and not self.ttlStorage:Get("has_been_taunted_recently") then
             for partyIndex = 1, 4 do
                 local unit = "party" .. tostring(partyIndex)
                 for i = 1, #GMR.Tables.Attackables do
@@ -682,10 +695,12 @@ local ok, err = pcall(function()
                         then
                             self.cr:printDbg("should cast hand of reckoning on '" .. GMR.UnitName(attackable) .. "' to taunt")
                             GMR.Cast(amstlib.CONST.SPELL.handOfReckoning, attackable)
+                            self.ttlStorage:Set("has_been_taunted_recently", true, 0.5)
                             return
                         elseif amstlib.CONST.SPELL_KNOWN.righteousDefense and GMR.IsCastable(amstlib.CONST.SPELL.righteousDefense, unit) then
                             self.cr:printDbg("should cast righteous defense on '" .. GMR.UnitName(unit) .. "' party member to taunt mobs from")
                             GMR.Cast(amstlib.CONST.SPELL.righteousDefense, unit)
+                            self.ttlStorage:Set("has_been_taunted_recently", true, 0.5)
                             return
                         end
                     end
@@ -790,15 +805,6 @@ local ok, err = pcall(function()
             return
         end
 
-        if self.cfg.useConsecrations and amstlib.CONST.SPELL_KNOWN.consecrations and not GMR.IsMoving()
-            and GMR.GetNumEnemies("player", 10) >= self.cfg.useConsecrationsMinEnemies
-            and GMR.IsCastable(amstlib.CONST.SPELL.consecrations, "player")
-        then
-            self.cr:printDbg("should use consecrations")
-            GMR.Cast(amstlib.CONST.SPELL.consecrations, "player")
-            return
-        end
-
         if self:executeGroupBuff() then
             return
         end
@@ -850,7 +856,8 @@ local ok, err = pcall(function()
                             cfg.useCrusaderAuraWhileMounterMinDistance,
                             state.defaultAura,
                             cfg.defaultAuraChangeIfAlreadyExist)
-                        local rotation = Rotation:new(cfg, state, cr, trinketer, auraChanger)
+
+                        local rotation = Rotation:new(cfg, state, cr, trinketer, auraChanger, ttlStorage)
                         return function()
                             rotation:execute()
                         end,
