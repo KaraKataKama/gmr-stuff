@@ -766,7 +766,7 @@ local ok, err = pcall(function()
             end
 
             if cr:getConfig()["onlineLoad"] then
-                cr:load("blablablabl", mainFunc)
+                cr:load("https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/backside/plugins/rotations/paladin/02_amstaffix_paladin_common.lua", mainFunc)
             else
                 mainFunc()
             end
