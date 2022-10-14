@@ -17,7 +17,7 @@
 
 local ID = "CR>P/P"
 local LIB_LINK = "https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/backside/plugins/custom/00_amstlib.lua"
-local ROTATION_LINK = "TODO"
+local ROTATION_LINK = "https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/backside/plugins/rotations/paladin/protection/v2/09_amstaffix_paladin_protection_rotation.lua"
 ---@type PaladinProtectionV2Config
 local Config = {
     ---Toggle debug mode. Turn on, if you encounter some issues and want to deal with it, or record a video and send
