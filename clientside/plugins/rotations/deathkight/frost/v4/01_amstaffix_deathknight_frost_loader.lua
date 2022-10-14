@@ -70,6 +70,12 @@ local Config = {
     useTrinket2Type = 1, -- 1:self-buff, 2:target-harmful, 3:aoe-harmful
 }
 
+local function printDbg(msg)
+    if Config.debug then
+        GMR.Print("[" .. ID .. "][DEBUG] " .. msg)
+    end
+end
+
 do
     local msgPrefix = "[" .. ID .. "] "
     if Config.onlineLoad then
@@ -77,14 +83,17 @@ do
             Url = LIB_LINK,
             Method = "Get",
             Callback = function(content)
+                printDbg("library has been downloaded, now we'll try to execute it")
                 RunScript(content)
                 if not amstlib then
                     GMR.Print(msgPrefix .. "AmsTaFFix' Lib do not initialized properly")
                     return
                 end
 
+                printDbg("library successfully initialized, start work with rotation")
                 local cr = amstlib:getCombatRotation(ID)
                 cr:prepare(Config)
+                printDbg("rotation has been prepared, start loading the file with rotation")
                 cr:load(ROTATION_LINK)
             end
         })

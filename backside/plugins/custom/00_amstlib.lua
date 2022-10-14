@@ -573,13 +573,18 @@ local isSuccess, err = pcall(function()
         end
 
         if self.config.onlineLoad then
+            self:printDbg("start loading rotation file")
             GMR.SendHttpRequest({
                 Url = link,
                 Method = "Get",
                 Callback = function(content)
+                    self:printDbg("rotation has been downloaded, executing it")
                     RunScript(content)
+                    self:printDbg("rotation has been executed")
                     if callback then
+                        self:printDbg("rotation's loader has callback, start executing it")
                         callback()
+                        self:printDbg("callback has been executed")
                     end
                 end
             })
