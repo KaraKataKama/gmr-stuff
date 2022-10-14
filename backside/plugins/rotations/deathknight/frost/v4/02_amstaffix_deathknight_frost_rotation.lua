@@ -705,17 +705,27 @@ do
             VERSION,
             function()
                 if GMR.GetClass("player") ~= amstlib.CONST.CLASS.DEATHKNIGHT then
+                    cr:printDbg("player is not Death Knight, skip")
                     return false
                 end
+
+                cr:printDbg("player is Death Knight, should make next check")
 
                 local playerName = GMR.UnitName("player")
                 for _, name in ipairs(cr:getConfig()["forceLoadForCharacters"] or {}) do
                     if playerName == name then
+                        cr:printDbg("force load for character " .. name)
                         return true
                     end
                 end
 
-                return amstlib.Util.getDeepestTalentTab() == 2
+                if amstlib.Util.getDeepestTalentTab() == 2 then
+                    cr:printDbg("player has proper talents tree, loading rotation")
+                    return true
+                end
+
+                cr:printDbg("player is not suitable for rotation, skip")
+                return false
             end,
             function()
                 local cfg = Config:new(cr)
