@@ -15,12 +15,17 @@
 --You should have received a copy of the GNU General Public License
 --along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+local VERSION = 1
 local isSuccess, err = pcall(function()
     if amstlib then
-        return -- skip double loaded situations
+        if (amstlib.VERSION or 0) > VERSION then
+            return -- older lib should not overwrite newer one
+        end
     end
     ---@class AmstLib
     amstlib = {}
+    ---@type number version of library
+    amstlib.VERSION = VERSION
     ---@type table<string, AmstLibCombatRotation>
     amstlib.combatRotations = {}
 
