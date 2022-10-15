@@ -578,7 +578,7 @@ local isSuccess, err = pcall(function()
         end
 
         if self.config.onlineLoad then
-            self:printDbg("start loading rotation file")
+            self:printDbg("start loading rotation file '" .. link .. "'")
             GMR.SendHttpRequest({
                 Url = link,
                 Method = "Get",
