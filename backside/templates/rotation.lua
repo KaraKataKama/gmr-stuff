@@ -152,17 +152,27 @@ do
             VERSION,
             function()
                 if GMR.GetClass("player") ~= "TEMPLATE_FOR_CLASS" then
+                    cr:printDbg("player is not target class, skip")
                     return false
                 end
+
+                cr:printDbg("player is target class, should make next check")
 
                 local playerName = GMR.UnitName("player")
                 for _, name in ipairs(cr:getConfig()["forceLoadForCharacters"] or {}) do
                     if playerName == name then
+                        cr:printDbg("rotation should be force loaded for character " .. name)
                         return true
                     end
                 end
 
-                return amstlib.Util.getDeepestTalentTab() == 999999
+                if amstlib.Util.getDeepestTalentTab() == 999999 then
+                    cr:printDbg("player has proper talents tree, loading rotation")
+                    return true
+                end
+
+                cr:printDbg("player has most his talents in another talent tree, please check you build")
+                return false
             end,
             function()
                 local cfg = Config:new(cr)
