@@ -17,16 +17,16 @@
 
 local ID = "CR>P/H"
 local LIB_LINK = "https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/backside/plugins/custom/00_amstlib.lua"
-local ROTATION_LINK = "TODO"
+local ROTATION_LINK = "https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/backside/plugins/rotations/paladin/holy/v2/09_amstaffix_paladin_holy_rotation.lua"
 ---@type PaladinHolyV2Config
 local Config = {
     ---Toggle debug mode. Turn on, if you encounter some issues and want to deal with it, or record a video and send
     ---to author.
-    debug = true,
+    debug = false,
     ---Use standard CombatRotation pluggable function. Change only if you know what you are doing.
     useCombatRotationLauncher = false,
     ---Use online loading feature to get last updates
-    onlineLoad = false,
+    onlineLoad = true,
 
     groupCleanseModEnabled = true,
     useJudgmentType = 1, -- 1:Judgement of Light; 2:Judgement of Wisdom; 3:Judgement of Justice;
