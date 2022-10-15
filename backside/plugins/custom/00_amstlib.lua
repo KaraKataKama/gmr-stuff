@@ -15,7 +15,7 @@
 --You should have received a copy of the GNU General Public License
 --along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-local VERSION = 1
+local VERSION = 2
 local isSuccess, err = pcall(function()
     if amstlib then
         if (amstlib.VERSION or 0) > VERSION then
