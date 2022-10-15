@@ -5,6 +5,19 @@ This repository holds plugins (mostly combat rotations), profiles for WotLK
 Please follow to the `clientside/` directory and choose plugins/profiles. Every work has its own `README.md` file, 
 please read it before start using plugin/profile.
 
+## Rotations
+### Death Knight
+- [Frost](https://github.com/AmsTaFFix/gmr-stuff/tree/main/clientside/plugins/rotations/deathkight/frost/v4)
+- [Blood](https://github.com/AmsTaFFix/gmr-stuff/tree/main/clientside/plugins/rotations/deathkight/blood/v4)
+- ### Mage
+- [Arcane](https://github.com/AmsTaFFix/gmr-stuff/tree/main/clientside/plugins/rotations/mage/arcane/v1)
+### Paladin
+- [Retribution](https://github.com/AmsTaFFix/gmr-stuff/tree/main/plugins/wotlk/rotations/paladin)
+- [Protection](https://github.com/AmsTaFFix/gmr-stuff/tree/main/clientside/plugins/rotations/paladin/protection/v2)
+- [Holy](https://github.com/AmsTaFFix/gmr-stuff/tree/main/clientside/plugins/rotations/paladin/holy/v2)
+### Shaman
+- [Elemental](https://github.com/AmsTaFFix/gmr-stuff/tree/main/plugins/wotlk/rotations/shaman)
+
 ## Donation
 I will be very grateful for a cup of coffee :)
 
