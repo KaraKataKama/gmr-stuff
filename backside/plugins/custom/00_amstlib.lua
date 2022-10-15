@@ -22,7 +22,7 @@ local isSuccess, err = pcall(function()
             GMR.Print("Already have amstlib v" .. tostring(amstlib.VERSION) .. ", should not rewrite it")
             return -- older lib should not overwrite newer one
         else
-            GMR.Print("Already have amstlig, it is have older version v" .. tostring(amstlib.VERSION) .. " vs v" .. VERSION .. " version, should rewrite")
+            GMR.Print("Already have amstlib, it is have older version v" .. tostring(amstlib.VERSION) .. " vs v" .. VERSION .. " version, should rewrite")
         end
     end
     ---@class AmstLib
