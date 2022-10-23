@@ -1,4 +1,6 @@
 # CHANGELOG:
+## v4.1.0
+- add a feature to cast death pact instantly on HP threshold
 ## v4.0.3
 - added possibility to use death strike
 ## v4.0.2

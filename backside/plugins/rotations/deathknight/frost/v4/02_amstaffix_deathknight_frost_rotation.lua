@@ -16,7 +16,7 @@
 --along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 local ID = "CR>DK/F"
-local VERSION = "v4.0.3"
+local VERSION = "v4.1.0"
 
 ---@class DeathKnightFrostV4Config
 local Config = {
@@ -48,6 +48,8 @@ local Config = {
     minEnemiesCountToRaiseDead = 2,
 
     minHPToUseDeathPact = 80,
+    --- IF HP < N, then use death pact instantly
+    useDeathPactMinHpForcibly = 40,
 
     useHowlingBlastMinEnemies = 3,
 
@@ -452,7 +454,9 @@ function Rotation:execute()
 
     if amstlib.CONST.SPELL_KNOWN.raiseDead and GetSpellCooldown(amstlib.CONST.SPELL.raiseDead) > 0 then
         local secondsLeftAfterCast = GetTime() - GetSpellCooldown(amstlib.CONST.SPELL.raiseDead)
-        if secondsLeftAfterCast >= 45 and secondsLeftAfterCast <= 60 and GMR.GetHealth("player") < self.cfg.minHPToUseDeathPact
+        if (
+            (secondsLeftAfterCast >= 45 and secondsLeftAfterCast <= 60 and GMR.GetHealth("player") < self.cfg.minHPToUseDeathPact)
+                or (secondsLeftAfterCast <= 60 and GMR.GetHealth("player") <= self.cfg.useDeathPactMinHpForcibly))
             and GMR.IsCastable(amstlib.CONST.SPELL.deathPact, "player")
         then
             self.cr:printDbg("should cast Death Pact to heal")

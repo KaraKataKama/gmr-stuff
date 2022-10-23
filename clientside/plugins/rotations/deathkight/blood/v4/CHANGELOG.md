@@ -1,4 +1,6 @@
 # CHANGELOG:
+## v4.1.0
+- add a feature to cast death pact instantly on HP threshold
 ## v4.0.2
 - added more convenient way to choose proper rotation
 - added possibility to force load rotation to specific nick

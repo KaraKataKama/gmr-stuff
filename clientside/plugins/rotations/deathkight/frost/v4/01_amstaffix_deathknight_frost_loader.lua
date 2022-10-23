@@ -48,6 +48,8 @@ local Config = {
     minEnemiesCountToRaiseDead = 2,
 
     minHPToUseDeathPact = 80,
+    --- IF HP < N, then use death pact instantly
+    useDeathPactMinHpForcibly = 40,
 
     useHowlingBlastMinEnemies = 3,
 

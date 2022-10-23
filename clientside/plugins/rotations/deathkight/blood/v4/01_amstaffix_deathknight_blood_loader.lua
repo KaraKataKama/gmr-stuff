@@ -53,7 +53,10 @@ local Config = {
 
     ---Min HP to start using Death Strike more often
     useDeathStrikeMoreOftenMinHP = 90,
+
     useDeathPactMinHP = 80,
+    --- IF HP < N, then use death pact instantly
+    useDeathPactMinHpForcibly = 40,
 
     usePlagueStrikeAsFiller = false,
     useIcyTouchAsFiller = false,
