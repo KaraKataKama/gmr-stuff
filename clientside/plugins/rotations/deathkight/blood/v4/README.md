@@ -2,7 +2,7 @@
 
 ## Features
 - trying his best to execute proper rotation according to [this guide](https://www.wowhead.com/wotlk/guides/blood-death-knight-tank-overview-best-races-professions)
-- tested with [this build](https://www.wowhead.com/wotlk/talent-calc/death-knight/23050005-32005350352203012300033101351_001s8q11s9f21xv631ts841sxd51s8g)
+- tested with [this build](https://www.wowhead.com/wotlk/talent-calc/death-knight/005512153300331023122013-3050204-0052021001_001xv611sy831s8g41sxd51ts8)
 - online updates
 - open source
 
