@@ -17,7 +17,7 @@
 
 AMST_SHARE = AMST_SHARE or {}
 AMST_SHARE["CR>P/R.LOADED"] = true
-local VERSION = "v1.7.1"
+local VERSION = "v1.7.2"
 local printMsgPrefix = "[CR>P/R|" .. VERSION .. "] "
 
 ---Print message with CR prefix
@@ -678,19 +678,20 @@ function Rotation:execute()
             and not GMR.HasBuff("target", self.state.judgmentToUseDebuff, true))
         then
             local unitToCast = "target"
-            if self.cfg.useJudgmentTryToCleave then
-                for i = 1, #GMR.Tables.Attackables do
-                    local attackable = GMR.Tables.Attackables[i][1]
-                    if GMR.ObjectExists(attackable) and GMR.IsCastable(self.state.judgmentToUse, attackable)
-                        and GMR.GetDistance("player", attackable, "<", 10)
-                        and not GMR.IsImmune(attackable)
-                        and GMR.GetDebuffExpiration(attackable, self.state.judgmentToUseDebuff) < self.cfg.useJudgmentCooldown
-                    then
-                        unitToCast = attackable
-                        break
-                    end
-                end
-            end
+            --not works as intended, temporary remove
+            --if self.cfg.useJudgmentTryToCleave then
+            --    for i = 1, #GMR.Tables.Attackables do
+            --        local attackable = GMR.Tables.Attackables[i][1]
+            --        if GMR.ObjectExists(attackable) and GMR.IsCastable(self.state.judgmentToUse, attackable)
+            --            and GMR.GetDistance("player", attackable, "<", 10)
+            --            and not GMR.IsImmune(attackable)
+            --            and GMR.GetDebuffExpiration(attackable, self.state.judgmentToUseDebuff) < self.cfg.useJudgmentCooldown
+            --        then
+            --            unitToCast = attackable
+            --            break
+            --        end
+            --    end
+            --end
 
             if unitToCast and GMR.IsCastable(self.state.judgmentToUse, unitToCast) then
                 self.dbgPrint("should cast default judgment '" .. self.state.judgmentToUse .. "'")
