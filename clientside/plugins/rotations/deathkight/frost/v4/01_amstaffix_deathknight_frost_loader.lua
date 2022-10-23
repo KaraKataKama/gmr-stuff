@@ -63,6 +63,11 @@ local Config = {
     useCorpseExplosion = false,
     useCorpseExplosionMinEnemies = 3,
 
+    --- should use death strike in some circumstances
+    useDeathStrike = true,
+    --- Using Death strike when HP < N
+    useDeathStrikeMaxHp = 60,
+
     useTrinket1 = false,
     useTrinket1Type = 1, -- 1:self-buff, 2:target-harmful, 3:aoe-harmful
 

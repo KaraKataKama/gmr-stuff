@@ -1,4 +1,6 @@
 # CHANGELOG:
+## v4.0.3
+- added possibility to use death strike
 ## v4.0.2
 - added more convenient way to choose proper rotation
 - added possibility to force load rotation to specific nick

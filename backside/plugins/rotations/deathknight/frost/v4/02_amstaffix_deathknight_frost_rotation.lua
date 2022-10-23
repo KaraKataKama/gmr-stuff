@@ -16,7 +16,7 @@
 --along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 local ID = "CR>DK/F"
-local VERSION = "v4.0.2"
+local VERSION = "v4.0.3"
 
 ---@class DeathKnightFrostV4Config
 local Config = {
@@ -62,6 +62,11 @@ local Config = {
 
     useCorpseExplosion = false,
     useCorpseExplosionMinEnemies = 3,
+
+    --- should use death strike in some circumstances
+    useDeathStrike = false,
+    --- Using Death strike when HP < N
+    useDeathStrikeMaxHp = 60,
 
     useTrinket1 = false,
     useTrinket1Type = 1, -- 1:self-buff, 2:target-harmful, 3:aoe-harmful
@@ -596,6 +601,15 @@ function Rotation:execute()
             GMR.Cast(amstlib.CONST.SPELL.pestilence, "target")
             return
         end
+    end
+
+    if self.cfg.useDeathStrike and amstlib.CONST.SPELL_KNOWN.deathStrike
+        and GMR.IsCastable(amstlib.CONST.SPELL.deathStrike, "target")
+        and GMR.GetHealth("target") <= self.cfg.useDeathStrikeMaxHp
+    then
+        self.cr:printDbg("should cast death strike to heal")
+        GMR.Cast(amstlib.CONST.SPELL.deathStrike, "target")
+        return
     end
 
     if amstlib.CONST.SPELL_KNOWN.frostStrike and GMR.IsCastable(amstlib.CONST.SPELL.frostStrike, "target")
