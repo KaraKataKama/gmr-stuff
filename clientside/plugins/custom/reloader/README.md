@@ -5,7 +5,7 @@
 - plugins can detect reloading state by `AMSTREPLUG_IN_PROGRESS` global variable
 
 ## Installation
-- download [00_reloader.lua](https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/clientside/plugins/custom/00_reloader.lua)
+- download [00_reloader.lua](https://raw.githubusercontent.com/AmsTaFFix/gmr-stuff/main/clientside/plugins/custom/reloader/00_reloader.lua)
 - place downloaded file `00_reloader.lua` into
   - HWT: `{HWT_Dir}/addons/Wrath of the Lichking/Plugins/`
   - Tinkr: `{Tinkr_Dir}/scripts/GMR/Plugins/`
