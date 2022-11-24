@@ -636,6 +636,36 @@ local isSuccess, err = pcall(function()
         end
     end
 
+    ---@param link string URL to load
+    ---@param callback fun():void function to call after exec link's content
+    ---@return boolean, string result and details
+    function AmstLibCombatRotation:loadEncrypted(link, callback)
+        if not self.isPrepared then
+            error("rotation not prepared, should call prepare() func first")
+            return
+        end
+
+        if self.config.onlineLoad then
+            self:printDbg("start loading encrypted rotation file '" .. link .. "'")
+            GMR.SendHttpRequest({
+                Url = link,
+                Method = "Get",
+                Callback = function(content)
+                    self:printDbg("encrypted rotation has been downloaded, executing it")
+                    GMR.RunEncryptedScript(content)
+                    self:printDbg("encrypted rotation has been executed")
+                    if callback then
+                        self:printDbg("encrypted rotation's loader has callback, start executing it")
+                        callback()
+                        self:printDbg("callback has been executed")
+                    end
+                end
+            })
+        else
+            self:print("Offline loading turned on")
+        end
+    end
+
     ---@param version string
     ---@param checkFunc fun():boolean
     ---@param createFunc fun():fun(),fun(),fun() function create of rotation's executer, after launch utility function, close operations function
