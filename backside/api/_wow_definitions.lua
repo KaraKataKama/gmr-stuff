@@ -18,3 +18,8 @@ function GetSpellCount(spell)  end
 ---@param isInspect boolean|nil
 ---@return string, number, number, number, number, number, number, number name, iconTexture, tier, column, rank, maxRank, isExceptional, available
 function GetTalentInfo(tabIndex, talentIndex, isInspect)  end
+
+---@class WoWAPITimer
+WoWAPITimer = {}
+function WoWAPITimer:Cancel() end
+function WoWAPITimer:IsCancelled() end

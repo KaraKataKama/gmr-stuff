@@ -390,7 +390,8 @@ function GMR.GetDestGryphonMaster() end
 ---@return number
 function GMR.GetDestinationDistance() end
 function GMR.GetDifference() end
-function GMR.GetDirectoryFiles() end
+---@param dir string
+function GMR.GetDirectoryFiles(dir) end
 function GMR.GetDiscordWebhook() end
 function GMR.GetDiscoverFlightmasters() end
 function GMR.GetDisenchantableItem() end
