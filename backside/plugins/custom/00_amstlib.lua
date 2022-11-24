@@ -15,12 +15,17 @@
 --You should have received a copy of the GNU General Public License
 --along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-local VERSION = 2
+local VERSION = 3
 local isSuccess, err = pcall(function()
     if amstlib then
         if (amstlib.VERSION or 0) >= VERSION then
-            GMR.Print("Already have amstlib v" .. tostring(amstlib.VERSION) .. ", should not rewrite it")
-            return -- older lib should not overwrite newer one
+            if _G["AMSTREPLUG_IN_PROGRESS"] then
+                (amstlib.close or function() end)()
+                GMR.Print("Previous instance of amstlib has been closed, new one will load")
+            else
+                GMR.Print("Already have amstlib v" .. tostring(amstlib.VERSION) .. ", should not rewrite it")
+                return -- older lib should not overwrite newer one
+            end
         else
             GMR.Print("Already have amstlib, it is have older version v" .. tostring(amstlib.VERSION) .. " vs v" .. VERSION .. " version, should rewrite")
         end
@@ -191,6 +196,9 @@ local isSuccess, err = pcall(function()
         coneOfCold = GetSpellInfo(10161),
         fireball = GetSpellInfo(10151),
         presenceOfMind = GetSpellInfo(12043),
+        scourgeStrike = GetSpellInfo(55090),
+        ghoulFrenzy = GetSpellInfo(63560),
+        boneShield = GetSpellInfo(49222),
     }
 
     amstlib.CONST.SPELL_KNOWN = {
@@ -316,6 +324,9 @@ local isSuccess, err = pcall(function()
         coneOfCold = GMR.IsSpellKnown(amstlib.CONST.SPELL.coneOfCold),
         fireball = GMR.IsSpellKnown(amstlib.CONST.SPELL.fireball),
         presenceOfMind = GMR.IsSpellKnown(amstlib.CONST.SPELL.presenceOfMind),
+        scourgeStrike = GMR.IsSpellKnown(amstlib.CONST.SPELL.scourgeStrike),
+        ghoulFrenzy = GMR.IsSpellKnown(amstlib.CONST.SPELL.ghoulFrenzy),
+        boneShield = GMR.IsSpellKnown(amstlib.CONST.SPELL.boneShield),
     }
 
     amstlib.CONST.BUFF = {
@@ -366,6 +377,9 @@ local isSuccess, err = pcall(function()
         beaconOfLight = GetSpellInfo(53563),
         missileBarrage = GetSpellInfo(44401),
         presenceOfMind = GetSpellInfo(12043),
+        desolation = GetSpellInfo(66817),
+        ghoulFrenzy = GetSpellInfo(63560),
+        boneShield = GetSpellInfo(49222),
     }
 
     amstlib.CONST.DEBUFF = {
@@ -476,6 +490,14 @@ local isSuccess, err = pcall(function()
         EVOKER = "EVOKER",
     }
 
+    function amstlib.close()
+        for name, cr in pairs(amstlib.combatRotations) do
+            GMR.Print("closing '" .. name .. "' rotation")
+            cr:close()
+            GMR.Print("'" .. name .. "' rotation has been closed")
+        end
+    end
+
     ---@class AmstLibCombatRotation
     AmstLibCombatRotation = {}
     AmstLibCombatRotation.id = ""
@@ -486,6 +508,9 @@ local isSuccess, err = pcall(function()
     AmstLibCombatRotation.version = ""
     AmstLibCombatRotation.msgPrefix = "[CR]"
     AmstLibCombatRotation.previousDbgMessagePerSlot = {}
+    ---@type AmstLibTimerList
+    AmstLibCombatRotation.timers = {}
+    AmstLibCombatRotation.closeFuncs = {}
     AmstLibCombatRotation.config = {
         onlineLoad = true,
         debug = false,
@@ -497,7 +522,7 @@ local isSuccess, err = pcall(function()
     ---@return AmstLibCombatRotation
     function AmstLibCombatRotation:new(id)
         ---@type AmstLibCombatRotation
-        local o = { id = id }
+        local o = {id = id, timers = AmstLibTimerList:new()}
         setmetatable(o, self)
         self.__index = self
 
@@ -518,13 +543,23 @@ local isSuccess, err = pcall(function()
 
     ---@param config table
     function AmstLibCombatRotation:validateConfig(config)
-        local fields = { "debug", "onlineLoad", "useCombatRotationLauncher" }
+        local fields = {"debug", "onlineLoad", "useCombatRotationLauncher"}
         for _, f in ipairs(fields) do
             if config[f] == nil then
                 error("there is no '" .. f .. "' field in config")
             end
         end
     end
+
+    function AmstLibCombatRotation:close()
+        self.timers:close()
+        GMR.CustomCombatConditions = function() end
+        for _, closeFunc in ipairs(self.closeFuncs) do
+            closeFunc()
+        end
+        GMR.Print(tostring(#self.closeFuncs) .. " close-funcs has been called")
+    end
+
     ---@param config table
     ---@return boolean, string result and details
     function AmstLibCombatRotation:prepare(config)
@@ -603,8 +638,8 @@ local isSuccess, err = pcall(function()
 
     ---@param version string
     ---@param checkFunc fun():boolean
-    ---@param rotationCreateFunc fun():fun(),fun() function create of rotation's executer and after launch utility functions
-    function AmstLibCombatRotation:initialize(version, checkFunc, rotationCreateFunc)
+    ---@param createFunc fun():fun(),fun(),fun() function create of rotation's executer, after launch utility function, close operations function
+    function AmstLibCombatRotation:initialize(version, checkFunc, createFunc)
         if not version then
             error("version is empty")
         end
@@ -625,7 +660,7 @@ local isSuccess, err = pcall(function()
         self.isInitialized = true
 
         self:print("Rotation would be initialized")
-        local rotation, callAfterLaunch = rotationCreateFunc()
+        local rotation, callAfterLaunch, closeFunc = createFunc()
         local executeRotationFunc = function()
             local isSuccess, err = pcall(rotation)
             if not isSuccess then
@@ -650,14 +685,14 @@ local isSuccess, err = pcall(function()
             end
 
             GMR.CustomCombatConditions = resultFunction
-            C_Timer.NewTicker(1, function()
+            self.timers:add(C_Timer.NewTicker(1, function()
                 if GMR.CustomCombatConditions ~= resultFunction then
                     GMR.CustomCombatConditions = resultFunction
                     self:printError("Something changed GMR.CustomCombatConditions func, it was changed back!")
                 end
-            end)
+            end))
         else
-            C_Timer.NewTicker(0.1, function()
+            self.timers:add(C_Timer.NewTicker(0.1, function()
                 if (not GMR.IsExecuting() or not GMR.IsAlive()) then
                     return
                 end
@@ -667,11 +702,15 @@ local isSuccess, err = pcall(function()
                 end
 
                 executeRotationFunc()
-            end)
+            end))
         end
 
         if callAfterLaunch then
             callAfterLaunch()
+        end
+
+        if closeFunc then
+            table.insert(self.closeFuncs, closeFunc)
         end
 
         self:print("Rotation fully initialized and turned on.")
@@ -708,7 +747,7 @@ local isSuccess, err = pcall(function()
 
     ---@return AmstLibInterrupter
     function AmstLibInterrupter:new(priority1List, priority2List)
-        local o = { priority1List = priority1List, priority2List = priority2List }
+        local o = {priority1List = priority1List, priority2List = priority2List}
         setmetatable(o, self)
         self.__index = self
         return o
@@ -877,7 +916,7 @@ local isSuccess, err = pcall(function()
 
     ---@param cr AmstLibCombatRotation
     function AmstLibTrinketer:new(cr)
-        local o = { cr = cr }
+        local o = {cr = cr}
         setmetatable(o, self)
         self.__index = self
         return o
@@ -893,7 +932,7 @@ local isSuccess, err = pcall(function()
             error("spell to check GCD is empty")
         end
 
-        local fieldsToUse = { "useTrinket1", "useTrinket1Type", "useTrinket2", "useTrinket2Type" }
+        local fieldsToUse = {"useTrinket1", "useTrinket1Type", "useTrinket2", "useTrinket2Type"}
         local missedFields = {}
         for _, field in ipairs(fieldsToUse) do
             if self.cr:getConfig()[field] == nil then
@@ -917,10 +956,10 @@ local isSuccess, err = pcall(function()
 
         local trinketRawData = {}
         if self.cr:getConfig()["useTrinket1"] then
-            table.insert(trinketRawData, { 1, self.cr:getConfig()["useTrinket1Type"] })
+            table.insert(trinketRawData, {1, self.cr:getConfig()["useTrinket1Type"]})
         end
         if self.cr:getConfig()["useTrinket2"] then
-            table.insert(trinketRawData, { 2, self.cr:getConfig()["useTrinket2Type"] })
+            table.insert(trinketRawData, {2, self.cr:getConfig()["useTrinket2Type"]})
         end
         for _, trinketData in ipairs(trinketRawData) do
             local trinket = AmstLibTrinket:new(trinketData[1], trinketData[2])
@@ -965,6 +1004,7 @@ local isSuccess, err = pcall(function()
 
         return false
     end
+
     -- ----------- --
     -- TTL Storage --
     -- ----------- --
@@ -973,14 +1013,18 @@ local isSuccess, err = pcall(function()
     AmstLibTtlStorage = {}
     ---@type table<string, table>
     AmstLibTtlStorage.data = {}
+    ---@type AmstLibTimerList
+    AmstLibTtlStorage.timers = nil
 
     function AmstLibTtlStorage:new()
         ---@type AmstLibTtlStorage
-        local o = {}
+        local o = {
+            timers = AmstLibTimerList:new()
+        }
         setmetatable(o, self)
         self.__index = self
 
-        C_Timer.NewTicker(0.1, function()
+        o.timers:add(C_Timer.NewTicker(0.1, function()
             local curTime = GetTime()
             local keysToRemove = {}
             for k, v in pairs(o.data) do
@@ -992,18 +1036,53 @@ local isSuccess, err = pcall(function()
             for _, keyToRemove in ipairs(keysToRemove) do
                 o.data[keyToRemove] = nil
             end
-        end)
+        end))
+
         return o
     end
-    function AmstLibTtlStorage:Get(key)
+    function AmstLibTtlStorage:get(key)
         if not self.data[key] then
             return nil
         end
 
         return self.data[key][1]
     end
-    function AmstLibTtlStorage:Set(key, value, ttl)
-        self.data[key] = { value, GetTime() + ttl }
+    function AmstLibTtlStorage:set(key, value, ttl)
+        self.data[key] = {value, GetTime() + ttl}
+    end
+    function AmstLibTtlStorage:close()
+        self.timers:close()
+    end
+
+    -- ---------- --
+    -- Timer List --
+    -- ---------- --
+
+    ---@class AmstLibTimerList
+    AmstLibTimerList = {}
+    ---@type WoWAPITimer[]
+    AmstLibTimerList.timers = {}
+
+    function AmstLibTimerList:new()
+        ---@type AmstLibTimerList
+        local o = {
+            timers = {},
+        }
+        setmetatable(o, self)
+        self.__index = self
+
+        return o
+    end
+    ---@param timer WoWAPITimer
+    function AmstLibTimerList:add(timer)
+        table.insert(self.timers, timer)
+    end
+    function AmstLibTimerList:close()
+        for _, timer in ipairs(self.timers) do
+            timer:Cancel()
+        end
+        GMR.Print(tostring(#self.timers) .. " timers has been closed")
+        self.timers = {}
     end
 end)
 

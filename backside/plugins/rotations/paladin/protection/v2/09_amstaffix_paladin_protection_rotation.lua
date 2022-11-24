@@ -683,7 +683,7 @@ local ok, err = pcall(function()
             return
         end
 
-        if self.cfg.useAggroSpellsInGroup and UnitInParty("player") and not self.ttlStorage:Get("has_been_taunted_recently") then
+        if self.cfg.useAggroSpellsInGroup and UnitInParty("player") and not self.ttlStorage:get("has_been_taunted_recently") then
             for partyIndex = 1, 4 do
                 local unit = "party" .. tostring(partyIndex)
                 for i = 1, #GMR.Tables.Attackables do
@@ -695,12 +695,12 @@ local ok, err = pcall(function()
                         then
                             self.cr:printDbg("should cast hand of reckoning on '" .. GMR.UnitName(attackable) .. "' to taunt")
                             GMR.Cast(amstlib.CONST.SPELL.handOfReckoning, attackable)
-                            self.ttlStorage:Set("has_been_taunted_recently", true, 0.5)
+                            self.ttlStorage:set("has_been_taunted_recently", true, 0.5)
                             return
                         elseif amstlib.CONST.SPELL_KNOWN.righteousDefense and GMR.IsCastable(amstlib.CONST.SPELL.righteousDefense, unit) then
                             self.cr:printDbg("should cast righteous defense on '" .. GMR.UnitName(unit) .. "' party member to taunt mobs from")
                             GMR.Cast(amstlib.CONST.SPELL.righteousDefense, unit)
-                            self.ttlStorage:Set("has_been_taunted_recently", true, 0.5)
+                            self.ttlStorage:set("has_been_taunted_recently", true, 0.5)
                             return
                         end
                     end
@@ -844,6 +844,7 @@ local ok, err = pcall(function()
                         local state = State:new()
                         state:determine(cr, cfg)
 
+                        local timers = AmstLibTimerList:new()
                         local ttlStorage = AmstLibTtlStorage:new()
                         if cfg.groupCleanseModEnabled and cfg.useCombatRotationLauncher then
                             cr:print("You have turned on `groupCleanseModEnabled`;therefore, you should turn off `useCombatRotationLauncher` to get better results")
@@ -862,9 +863,12 @@ local ok, err = pcall(function()
                             rotation:execute()
                         end,
                         function()
-                            C_Timer.NewTicker(0.5, function()
+                            timers:add(C_Timer.NewTicker(0.5, function()
                                 auraChanger:execute()
-                            end)
+                            end))
+                        end,
+                        function()
+                            timers:close()
                         end
                     end
                 )
