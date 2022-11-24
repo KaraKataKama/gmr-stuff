@@ -1,4 +1,4 @@
-# WotLK > Plugin > Custom > Reloader
+# Any Expansion > Plugin > Custom > Reloader
 
 ## Features
 - reload all plugins
