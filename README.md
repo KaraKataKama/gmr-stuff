@@ -1,6 +1,9 @@
 # WotLK GMR Plugins&Profiles
 This repository holds plugins (mostly combat rotations), profiles for WotLK
 
+## Archived
+Because of latest changes in my life, i have no time to maintain that repository at all. I hope my work would be example of how things done in GMR, or even can answer some questions.
+
 ## Info for Clients
 Please follow to the `clientside/` directory and choose plugins/profiles. Every work has its own `README.md` file, 
 please read it before start using plugin/profile.
